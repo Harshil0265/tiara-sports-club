@@ -1,0 +1,6 @@
+{
+  "name": "SPORTIZAI Athletic Club & Performance Portal",
+  "description": "Official website and live athletic performance dashboard for SPORTIZAI Club. Explore premier facilities, fixtures, live match analytics, teams, and membership.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
