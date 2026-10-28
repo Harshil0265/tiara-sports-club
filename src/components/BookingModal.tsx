@@ -9,6 +9,7 @@ interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultFacilityId?: string;
+  mode?: 'slot' | 'coaching';
   isDarkMode?: boolean;
 }
 
@@ -24,6 +25,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   isOpen,
   onClose,
   defaultFacilityId = 'tennis-courts',
+  mode = 'slot',
   isDarkMode = true,
 }) => {
   const [selectedFacility, setSelectedFacility] = useState(defaultFacilityId);
@@ -41,7 +43,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [queryMessage, setQueryMessage] = useState('');
-  const [inquiryType, setInquiryType] = useState('Slot Booking & Availability');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -60,6 +61,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   } | null>(null);
 
   if (!isOpen) return null;
+
+  const isCoaching = mode === 'coaching';
+  const inquiryType = isCoaching ? 'Coaching Programs' : 'Slot Booking & Availability';
 
   // Helper to format start time + duration into readable range
   const getSimpleFacilityName = (id: string) => {
@@ -134,7 +138,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         inquiryId: refCode,
         facilityName: itemName,
         date,
-        timeSlot: formattedTimeSlot,
+        timeSlot: isCoaching ? 'Coaching Program Inquiry (batch timing to be confirmed)' : formattedTimeSlot,
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim(),
@@ -153,7 +157,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         code: refCode,
         item: itemName,
         date,
-        time: formattedTimeSlot,
+        time: isCoaching ? 'Coaching Program Inquiry' : formattedTimeSlot,
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim(),
@@ -250,17 +254,19 @@ Email: ${confirmedInquiry.email}`);
                 id="booking-modal-title"
                 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-tight"
               >
-                SPORTS, FITNESS & SLOT INQUIRY
+                {isCoaching ? 'COACHING PROGRAMS INQUIRY' : 'SPORTS, FITNESS & SLOT INQUIRY'}
               </h2>
               <p className={`text-xs mt-1 ${isDarkMode ? 'text-neutral-400' : 'text-slate-500'}`}>
-                Ask any slot query for Tennis, Pickleball, Badminton, Hyrox, Gymnastics, or Cafe in Vadodara. Our admin team will receive your query with full schedule details.
+                {isCoaching
+                  ? 'Ask about batches, fees, age groups and certified coaches for your sport. Our coaching desk will get back to you.'
+                  : 'Ask any slot query for Tennis, Pickleball, Badminton, Hyrox, Gymnastics, or Cafe in Vadodara. Our admin team will receive your query with full schedule details.'}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5">
-                  Select Facility / Arena
+                  {isCoaching ? 'Select Sport for Coaching' : 'Select Facility / Arena'}
                 </label>
                 <select
                   value={selectedFacility}
@@ -269,7 +275,7 @@ Email: ${confirmedInquiry.email}`);
                     isDarkMode ? 'bg-neutral-950 border-neutral-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
                   }`}
                 >
-                  {CLUB_FACILITIES.map((facility) => (
+                  {CLUB_FACILITIES.filter((f) => !isCoaching || f.id !== 'cafe-lounge').map((facility) => (
                     <option key={facility.id} value={facility.id}>
                       {getSimpleFacilityName(facility.id)}
                     </option>
@@ -278,6 +284,7 @@ Email: ${confirmedInquiry.email}`);
               </div>
 
               {/* Perfectly Aligned Preferred Date & Start Time Section */}
+              {!isCoaching && (<>
               <div
                 className={`p-3.5 rounded-xs border space-y-3.5 ${
                   isDarkMode ? 'bg-neutral-950/70 border-neutral-800' : 'bg-slate-50 border-slate-200'
@@ -404,6 +411,7 @@ Email: ${confirmedInquiry.email}`);
                   DESK NOTIFIED
                 </span>
               </div>
+              </>)}
 
               {/* Personal Information */}
               <div
@@ -480,7 +488,7 @@ Email: ${confirmedInquiry.email}`);
                       setQueryMessage(e.target.value);
                       if (errors.queryMessage) setErrors({ ...errors, queryMessage: '' });
                     }}
-                    placeholder="e.g. Please confirm slot availability and whether ball machines or loaner rackets are available..."
+                    placeholder={isCoaching ? 'e.g. Player age, current level, preferred batch timing, and monthly fee details...' : 'e.g. Please confirm slot availability and whether ball machines or loaner rackets are available...'}
                     className={`w-full border text-xs p-3 rounded-xs focus:border-red-500 focus:outline-none ${
                       errors.queryMessage ? 'border-red-500' : isDarkMode ? 'border-neutral-700 bg-neutral-950 text-white' : 'border-slate-300 bg-slate-50 text-slate-900'
                     }`}
@@ -506,7 +514,7 @@ Email: ${confirmedInquiry.email}`);
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Submit Query & Notify Admin</span>
+                      <span>{isCoaching ? 'Submit Coaching Inquiry' : 'Submit Query & Notify Admin'}</span>
                     </>
                   )}
                 </button>

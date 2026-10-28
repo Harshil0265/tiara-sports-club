@@ -29,6 +29,7 @@ import {
   Clock,
   Sparkles,
   ChevronRight,
+  GraduationCap,
   Zap,
   Navigation,
   ShieldCheck,
@@ -147,7 +148,7 @@ const HERO_ARENAS = [
 
 interface HomeViewProps {
   onNavigate: (route: NavRoute) => void;
-  onOpenBooking: (facilityId?: string) => void;
+  onOpenBooking: (facilityId?: string, mode?: 'slot' | 'coaching') => void;
   isDarkMode?: boolean;
 }
 
@@ -235,21 +236,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-md text-xs font-extrabold uppercase tracking-widest text-white shadow-lg transition-transform hover:-translate-y-0.5 cursor-pointer"
                 style={isDarkMode ? { backgroundColor: LOGO.blue } : { backgroundColor: LOGO.navy }}
               >
-                Slot & Facility Inquiry <ArrowRight className="w-4 h-4" />
+                Inquiry <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onNavigate('contact')}
                 className="inline-flex items-center gap-2 px-5 py-3.5 rounded-md text-xs font-extrabold uppercase tracking-widest border-2 border-[#0B0B0B] dark:border-white hover:bg-[#0B0B0B] hover:text-white dark:hover:bg-white dark:hover:text-[#0B0B0B] transition-colors cursor-pointer"
               >
                 <MapPin className="w-4 h-4" style={{ color: LOGO.vermilion }} />
-                Google Map & Venue
+                Google Maps
               </button>
               <button
-                onClick={() => onNavigate('facilities')}
-                className="inline-flex items-center gap-1.5 px-3 py-3.5 text-xs font-extrabold uppercase tracking-widest text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white cursor-pointer"
+                onClick={() => onOpenBooking(activeSport.facilityId, 'coaching')}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-md text-xs font-extrabold uppercase tracking-widest text-white shadow-lg transition-transform hover:-translate-y-0.5 cursor-pointer"
+                style={{ backgroundColor: LOGO.vermilion }}
               >
-                <ChevronRight className="w-3.5 h-3.5" style={{ color: LOGO.vermilion }} />
-                All Facilities
+                <GraduationCap className="w-4 h-4" />
+                Coaching Programs
               </button>
             </div>
 

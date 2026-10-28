@@ -29,6 +29,7 @@ export default function App() {
   });
   const [isBookingOpen, setIsBookingOpen] = useState<boolean>(false);
   const [bookingFacilityId, setBookingFacilityId] = useState<string>('tennis-courts');
+  const [bookingMode, setBookingMode] = useState<'slot' | 'coaching'>('slot');
   const [isAdminInboxOpen, setIsAdminInboxOpen] = useState<boolean>(false);
 
   // Task 4: First-time entry loading animation
@@ -80,8 +81,9 @@ export default function App() {
     }, 280);
   };
 
-  const handleOpenBooking = (facilityId: string = 'tennis-courts') => {
+  const handleOpenBooking = (facilityId: string = 'tennis-courts', mode: 'slot' | 'coaching' = 'slot') => {
     setBookingFacilityId(facilityId);
+    setBookingMode(mode);
     setIsBookingOpen(true);
   };
 
@@ -171,6 +173,7 @@ export default function App() {
         isOpen={isBookingOpen}
         onClose={handleCloseBooking}
         defaultFacilityId={bookingFacilityId}
+        mode={bookingMode}
         isDarkMode={isDarkMode}
       />
 
