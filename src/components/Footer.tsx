@@ -313,7 +313,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isDarkMode = true })
           }`}
         >
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
-            <span>© 2012–2026 TIARA SPORTS CLUB · Vadodara, Gujarat. All rights reserved.</span>
+            <span>© TIARA SPORTS CLUB · Vadodara, Gujarat. All rights reserved.</span>
             <span className="hidden sm:inline">·</span>
             <span className="whitespace-nowrap">
               Created with <span aria-label="love">❤️</span> by{' '}
