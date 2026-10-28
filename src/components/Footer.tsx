@@ -2,6 +2,7 @@ import React from 'react';
 import { NavRoute } from '../types';
 import { CLUB_LOCATION } from '../data/clubData';
 import { TiaraBrandLogo } from './TiaraBrandLogo';
+import { BrandBar } from './BrandBar';
 import { 
   MapPin, 
   Phone, 
@@ -37,9 +38,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isDarkMode = true })
       className={`border-t transition-colors ${
         isDarkMode
           ? 'bg-neutral-950 border-neutral-900 text-neutral-400'
-          : 'bg-white border-slate-200 text-slate-600'
+          : 'bg-[#F7F8FA] border-slate-200 text-slate-600'
       }`}
     >
+      <BrandBar className="h-2" />
       {/* Top Architectural Live Strip */}
       <div
         className={`border-b ${
@@ -95,7 +97,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isDarkMode = true })
             <p className="text-xs sm:text-sm leading-relaxed max-w-sm mt-3">
               Founded in 2012 in Vadodara, Gujarat. A premier multi-sport institution
               featuring championship tennis facilities, professional pickleball arena,
-              BWF teak badminton hall, and high-performance gym facility.
+              BWF teak badminton hall, Hyrox fitness box, gymnastics arena, and cafe.
             </p>
 
             <div className="space-y-2 pt-1">
@@ -103,7 +105,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isDarkMode = true })
                 <ShieldCheck className="w-3.5 h-3.5 text-red-600" />
                 <span>OFFICIAL VENUE · GUJARAT STATE MULTI-SPORT FEDERATION</span>
               </div>
-              <div className="text-[11px] font-mono text-neutral-500 block">
+              <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 block">
                 ISO 9001:2015 CERTIFIED ATHLETIC GROUNDS · SAMA-SAVLI ROAD
               </div>
             </div>
@@ -154,9 +156,27 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isDarkMode = true })
                   onClick={() => handleNav('facilities')}
                   className="hover:text-red-500 transition-colors cursor-pointer text-left font-medium"
                 >
-                  Gym
+                  Hyrox Fitness Box
                 </button>
-                <span className="font-mono text-[10px] text-red-500 px-1.5 py-0.5 rounded-xs bg-red-600/10">Strength Floor</span>
+                <span className="font-mono text-[10px] text-red-500 px-1.5 py-0.5 rounded-xs bg-red-600/10">Race Training</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <button
+                  onClick={() => handleNav('facilities')}
+                  className="hover:text-red-500 transition-colors cursor-pointer text-left font-medium"
+                >
+                  Gymnastics
+                </button>
+                <span className="font-mono text-[10px] text-red-500 px-1.5 py-0.5 rounded-xs bg-red-600/10">Certified Coaches</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <button
+                  onClick={() => handleNav('facilities')}
+                  className="hover:text-red-500 transition-colors cursor-pointer text-left font-medium"
+                >
+                  Cafe
+                </button>
+                <span className="font-mono text-[10px] text-red-500 px-1.5 py-0.5 rounded-xs bg-red-600/10">Open Daily</span>
               </li>
             </ul>
           </div>
@@ -218,7 +238,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isDarkMode = true })
               <li>
                 <button
                   onClick={() => handleNav('legal')}
-                  className="hover:text-red-500 transition-colors cursor-pointer text-neutral-500"
+                  className="hover:text-red-500 transition-colors cursor-pointer text-slate-500 dark:text-neutral-400"
                 >
                   Court Rules & Bylaws
                 </button>
@@ -289,13 +309,23 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isDarkMode = true })
         {/* Bottom Legal & Utility Bar */}
         <div
           className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-xs ${
-            isDarkMode ? 'border-neutral-900 text-neutral-500' : 'border-slate-200 text-slate-500'
+            isDarkMode ? 'border-neutral-900 text-neutral-400' : 'border-slate-200 text-slate-600'
           }`}
         >
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
             <span>© 2012–2026 TIARA SPORTS CLUB · Vadodara, Gujarat. All rights reserved.</span>
             <span className="hidden sm:inline">·</span>
-            <span className="font-mono text-[11px]">Affiliated with GSMSF & AITA</span>
+            <span className="whitespace-nowrap">
+              Created with <span aria-label="love">❤️</span> by{' '}
+              <a
+                href="https://www.uniqtechsolutions.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-red-500 hover:text-red-400 hover:underline transition-colors"
+              >
+                Uniqtech Solutions
+              </a>
+            </span>
           </div>
 
           <div className="flex items-center gap-5">

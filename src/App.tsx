@@ -20,7 +20,13 @@ import { LegalView } from './components/views/LegalView';
 
 export default function App() {
   const [currentRoute, setCurrentRoute] = useState<NavRoute>('home');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('tiara-theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
   const [isBookingOpen, setIsBookingOpen] = useState<boolean>(false);
   const [bookingFacilityId, setBookingFacilityId] = useState<string>('tennis-courts');
   const [isAdminInboxOpen, setIsAdminInboxOpen] = useState<boolean>(false);
@@ -36,18 +42,23 @@ export default function App() {
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
-      document.body.style.backgroundColor = '#090a0f';
+      document.body.style.backgroundColor = '#0a0a0a';
       document.body.style.color = '#f8fafc';
     } else {
       document.documentElement.classList.remove('dark');
-      document.body.style.backgroundColor = '#f8fafc';
-      document.body.style.color = '#0f172a';
+      document.body.style.backgroundColor = '#ffffff';
+      document.body.style.color = '#0b0b0b';
     }
   }, [isDarkMode]);
 
   // Working theme toggle
   const handleToggleDarkMode = () => {
-    setIsDarkMode((prev) => !prev);
+    setIsDarkMode((prev) => {
+      try {
+        localStorage.setItem('tiara-theme', prev ? 'light' : 'dark');
+      } catch {}
+      return !prev;
+    });
   };
 
   // Animated page redirection handler with sports icon loader
@@ -81,7 +92,7 @@ export default function App() {
   return (
     <div
       className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
-        isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-slate-900'
+        isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-white text-slate-900'
       }`}
     >
       {/* Task 4: Creative First-Time Site Entry Loading Page Animation */}

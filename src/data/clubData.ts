@@ -1,11 +1,27 @@
-import { MatchResult, StandingRow, Player, Facility, ClubEvent, BlogPost, AchievementMilestone } from '../types';
+import { MatchResult, StandingRow, Player, Facility, ClubEvent, BlogPost, AchievementMilestone, Coach } from '../types';
+import GYM_IMAGE_SRC from '../assets/images/athletic_gym_interior_1791482317405.jpg';
+import PICKLEBALL_IMAGE_SRC from '../assets/images/pickleball_court_action_1791444715313.jpg';
+import BADMINTON_GYM_IMAGE_SRC from '../assets/images/badminton_gym_complex_1791444733550.jpg';
+import TENNIS_COURT_IMAGE_SRC from '../assets/images/padel_tennis_court_1791443404210.jpg';
+import TROPHY_IMAGE_SRC from '../assets/images/trophy_showcase_awards_1791443423828.jpg';
+import ARENA_COMPLEX_IMAGE_SRC from '../assets/images/facility_indoor_arena_1791443385742.jpg';
+import GYMNASTICS_PLACEHOLDER from '../assets/images/gymnastics_arena_placeholder.svg';
+import CAFE_PLACEHOLDER from '../assets/images/cafe_lounge_placeholder.svg';
+import COACH_PLACEHOLDER from '../assets/images/coach_placeholder.svg';
 
-export const GYM_IMAGE = '/src/assets/images/athletic_gym_interior_1791482317405.jpg';
-export const PICKLEBALL_IMAGE = '/src/assets/images/pickleball_court_action_1791444715313.jpg';
-export const BADMINTON_GYM_IMAGE = '/src/assets/images/badminton_gym_complex_1791444733550.jpg';
-export const TENNIS_COURT_IMAGE = '/src/assets/images/padel_tennis_court_1791443404210.jpg';
-export const TROPHY_IMAGE = '/src/assets/images/trophy_showcase_awards_1791443423828.jpg';
-export const ARENA_COMPLEX_IMAGE = '/src/assets/images/facility_indoor_arena_1791443385742.jpg';
+// Drop real photos named gymnastics_arena.(jpg|jpeg|png|webp) / cafe_lounge.(jpg|jpeg|png|webp) into src/assets/images and they replace the placeholders automatically
+const gymnasticsPhotos = import.meta.glob('../assets/images/gymnastics_arena.{jpg,jpeg,png,webp}', { eager: true, import: 'default' }) as Record<string, string>;
+const cafePhotos = import.meta.glob('../assets/images/cafe_lounge.{jpg,jpeg,png,webp}', { eager: true, import: 'default' }) as Record<string, string>;
+
+export const GYMNASTICS_IMAGE = Object.values(gymnasticsPhotos)[0] || GYMNASTICS_PLACEHOLDER;
+export const CAFE_IMAGE = Object.values(cafePhotos)[0] || CAFE_PLACEHOLDER;
+export const COACH_PLACEHOLDER_IMAGE = COACH_PLACEHOLDER;
+export const GYM_IMAGE = GYM_IMAGE_SRC;
+export const PICKLEBALL_IMAGE = PICKLEBALL_IMAGE_SRC;
+export const BADMINTON_GYM_IMAGE = BADMINTON_GYM_IMAGE_SRC;
+export const TENNIS_COURT_IMAGE = TENNIS_COURT_IMAGE_SRC;
+export const TROPHY_IMAGE = TROPHY_IMAGE_SRC;
+export const ARENA_COMPLEX_IMAGE = ARENA_COMPLEX_IMAGE_SRC;
 
 export const VADODARA_LIVE_CONDITIONS = {
   temp: '28°C',
@@ -46,19 +62,28 @@ export const COURT_SLOTS_DATA = [
   },
   {
     id: 'slot-4',
-    facilityName: 'High-Performance Gym Strength Floor',
+    facilityName: 'Hyrox Fitness Box',
     time: '20:30 – 22:00',
-    tag: 'Night Conditioning Pass',
+    tag: 'Night Hyrox Training Session',
     price: '₹600/hr',
     status: 'AVAILABLE',
     spotsLeft: 4,
+  },
+  {
+    id: 'slot-5',
+    facilityName: 'Gymnastics Arena',
+    time: '16:30 – 18:00',
+    tag: 'Junior Gymnastics Batch',
+    price: '₹500/hr',
+    status: 'AVAILABLE',
+    spotsLeft: 6,
   },
 ];
 
 // Compatibility alias
 export const TURF_SLOTS_DATA = COURT_SLOTS_DATA;
 
-export const ADMIN_EMAIL = 'mikir@uniqtechsolutions.com';
+export const ADMIN_EMAIL = 'tsa.sports4@gmail.com';
 
 export const CLUB_LOCATION = {
   name: 'TIARA SPORTS CLUB',
@@ -77,6 +102,7 @@ export const CLUB_LOCATION = {
 export const MULTI_SPORTS_LIST = [
   {
     id: 'tennis',
+    facilityId: 'tennis-courts',
     name: 'Tennis',
     badge: 'ITF SPECIFICATION',
     courts: 'Championship Regulation Facility',
@@ -87,6 +113,7 @@ export const MULTI_SPORTS_LIST = [
   },
   {
     id: 'pickleball',
+    facilityId: 'pickleball-center',
     name: 'Pickleball',
     badge: 'FASTEST GROWING',
     courts: 'Dedicated Competition Arena',
@@ -97,6 +124,7 @@ export const MULTI_SPORTS_LIST = [
   },
   {
     id: 'badminton',
+    facilityId: 'badminton-arena',
     name: 'Badminton',
     badge: 'BWF CERTIFIED',
     courts: 'BWF Teak & Synthetic Complex',
@@ -106,21 +134,44 @@ export const MULTI_SPORTS_LIST = [
     openSlots: 'Prime Sessions Active Now',
   },
   {
-    id: 'gym',
-    name: 'Gym',
-    badge: 'STRENGTH & CONDITIONING',
-    courts: 'Elite Strength & Conditioning Floor',
-    desc: 'Commercial Technogym and Hammer Strength equipment, power racks, dumbbell suites, functional sprint turf, and cardio floor.',
+    id: 'hyrox',
+    facilityId: 'hyrox-fitness-box',
+    name: 'Hyrox Fitness Box',
+    badge: 'HYROX TRAINING BOX',
+    courts: 'Dedicated Hyrox Race-Simulation Floor',
+    desc: 'Purpose-built Hyrox training box with sled push and pull lanes, SkiErg and rowing stations, wall balls, farmer carries, sandbag lunges, and a running track for race-format conditioning.',
     image: GYM_IMAGE,
-    amenities: ['Physiotherapy on Site', 'InBody Body Composition', 'Certified S&C Trainers'],
+    amenities: ['Sled Push & Pull Lanes', 'SkiErg, Rower & Wall Balls', 'Certified Hyrox Coaches'],
+    openSlots: 'Open 06:00 - 23:00 Daily',
+  },
+  {
+    id: 'gymnastics',
+    facilityId: 'gymnastics-arena',
+    name: 'Gymnastics',
+    badge: 'ARTISTIC & RHYTHMIC',
+    courts: 'Dedicated Gymnastics Arena',
+    desc: 'Spring-floor gymnastics arena with balance beams, uneven and parallel bars, vault runway, rings, tumble tracks, and foam pit for kids, juniors, and adult beginners.',
+    image: GYMNASTICS_IMAGE,
+    amenities: ['Spring Floor & Foam Pit', 'Kids & Junior Batches', 'Certified Gymnastics Coaches'],
+    openSlots: 'Batches Open Morning & Evening',
+  },
+  {
+    id: 'cafe',
+    facilityId: 'cafe-lounge',
+    name: 'Cafe',
+    badge: 'CLUBHOUSE CAFE & LOUNGE',
+    courts: 'Tiara Cafe & Member Lounge',
+    desc: 'Relaxed clubhouse cafe for post-game recovery meals, protein shakes, fresh juices, coffee, and light bites, with a seating lounge overlooking the courts.',
+    image: CAFE_IMAGE,
+    amenities: ['Protein Shakes & Fresh Juices', 'Healthy Meals & Snacks', 'Court-View Seating Lounge'],
     openSlots: 'Open 06:00 - 23:00 Daily',
   },
 ];
 
 export const LIVE_TICKER_ITEMS = [
   'LIVE: GUJARAT STATE TENNIS OPEN · CHAMPIONSHIP CENTER ARENA · TIARA CLUB VADODARA',
-  'SLOT INQUIRIES: PICKLEBALL, BADMINTON & TENNIS SESSIONS OPEN FOR TODAY',
-  'TIARA GYM: PERSONALIZED CSCS ATHLETE CONDITIONING PROGRAM ENROLLMENT OPEN',
+  'SLOT INQUIRIES: PICKLEBALL, BADMINTON, TENNIS & GYMNASTICS SESSIONS OPEN FOR TODAY',
+  'HYROX FITNESS BOX & GYMNASTICS BATCHES: ENROLLMENT OPEN · VISIT TIARA CAFE AFTER YOUR SESSION',
   'SUMMER MULTI-SPORTS CAMP: REGISTRATIONS OPEN FOR AGES 6 TO 18 YEARS'
 ];
 
@@ -251,9 +302,9 @@ export const ACHIEVEMENTS_TIMELINE: AchievementMilestone[] = [
   },
   {
     year: 2020,
-    title: 'Launch of Pro Pickleball Center & High-Performance Gym',
+    title: 'Launch of Pro Pickleball Center & Hyrox Fitness Box',
     trophy: 'Vadodara Innovation Trophy',
-    description: 'Introduced Vadodara’s premier dedicated pro pickleball competition arena and elite high-performance strength and conditioning gym facility.',
+    description: 'Introduced Vadodara’s premier dedicated pro pickleball competition arena and elite Hyrox fitness and conditioning facility.',
     record: '24-2 Multi-League Record',
     mvp: 'Rohan Mehta'
   },
@@ -285,7 +336,7 @@ export const PLAYERS_ROSTER: Player[] = [
     id: 'p2',
     number: 7,
     name: 'Kabir Vaghela',
-    position: 'Gym S&C Lead / Racquet Specialist',
+    position: 'Hyrox & S&C Lead / Racquet Specialist',
     height: '6 ft 1 in (1.85 m)',
     ppg: 94.5,
     rpg: 9.4,
@@ -379,18 +430,46 @@ export const CLUB_FACILITIES: Facility[] = [
     image: BADMINTON_GYM_IMAGE
   },
   {
-    id: 'fitness-gym',
-    title: 'High-Performance Gym & Biomechanics',
-    subtitle: 'Strength, Conditioning & Biomechanics · Vadodara',
-    description: 'An elite athletic gym and conditioning floor featuring Technogym cardio, Hammer Strength plate-loaded machines, heavy barbell lifting platforms, and functional sprint turf track.',
-    capacity: '120 Athletes Simultaneously',
-    features: ['Heavy Lifting Platforms', 'Technogym Skill Line Cardio', 'Force Plate Deceleration Track', 'Contrast Recovery Suite'],
+    id: 'hyrox-fitness-box',
+    title: 'Hyrox Fitness Box',
+    subtitle: 'Hyrox Race Training & Conditioning · Vadodara',
+    description: 'A dedicated Hyrox training box featuring sled push and pull lanes, SkiErg and rowing stations, wall ball targets, farmers carry handles, sandbag lunges, and a running loop for full race simulations and functional fitness.',
+    capacity: '60 Athletes Simultaneously',
+    features: ['Sled Push & Pull Lanes', 'SkiErg & Concept2 Rowers', 'Wall Ball & Sandbag Stations', 'Hyrox Race Simulation Heats'],
     specs: [
-      { label: 'Conditioning Floor', value: 'Full-Service Air Conditioned Suite' },
-      { label: 'Trainers', value: 'CSCS Certified S&C Coaches' },
-      { label: 'Recovery', value: 'Contrast Ice Bath & Sauna' }
+      { label: 'Training Format', value: 'Hyrox 8 x 1 km Run + 8 Stations' },
+      { label: 'Coaches', value: 'Certified Hyrox Coaches' },
+      { label: 'Sessions', value: 'Group Classes & Personal Training' }
     ],
     image: GYM_IMAGE
+  },
+  {
+    id: 'gymnastics-arena',
+    title: 'Gymnastics Arena',
+    subtitle: 'Artistic Gymnastics & Tumbling · Vadodara',
+    description: 'A dedicated gymnastics arena with a sprung competition floor, balance beams, uneven and parallel bars, vault runway, rings, tumble track, and a foam landing pit for safe skill progression.',
+    capacity: '40 Gymnasts Simultaneously',
+    features: ['Sprung Competition Floor', 'Balance Beams & Bars', 'Foam Pit & Tumble Track', 'Kids, Junior & Adult Batches'],
+    specs: [
+      { label: 'Equipment', value: 'Floor, Beam, Bars, Vault & Rings' },
+      { label: 'Coaches', value: 'Certified Gymnastics Coaches' },
+      { label: 'Batches', value: 'Morning & Evening Programs' }
+    ],
+    image: GYMNASTICS_IMAGE
+  },
+  {
+    id: 'cafe-lounge',
+    title: 'Tiara Cafe & Lounge',
+    subtitle: 'Clubhouse Cafe & Member Lounge · Vadodara',
+    description: 'The clubhouse cafe serves post-workout protein shakes, fresh juices, coffee, healthy meals, and snacks in a relaxed lounge with views over the courts.',
+    capacity: '60 Guests Seating',
+    features: ['Protein Shakes & Fresh Juices', 'Healthy Meals & Snacks', 'Coffee & Beverages', 'Court-View Seating Lounge'],
+    specs: [
+      { label: 'Timings', value: '06:00 AM – 11:00 PM Daily' },
+      { label: 'Menu', value: 'Healthy, Light & Athlete-Friendly' },
+      { label: 'Seating', value: 'Indoor Lounge & Outdoor Deck' }
+    ],
+    image: CAFE_IMAGE
   }
 ];
 
@@ -615,10 +694,85 @@ export const BLOG_POSTS: BlogPost[] = [
 ];
 
 export const GALLERY_ITEMS = [
-  { id: 'g1', title: 'High-Performance Gym Training Floor', category: 'Gym', image: GYM_IMAGE, subtitle: 'Strength & Conditioning Suite' },
+  { id: 'g1', title: 'Hyrox Fitness Box Training Floor', category: 'Hyrox', image: GYM_IMAGE, subtitle: 'Race Simulation & Conditioning' },
   { id: 'g2', title: 'Championship Tennis Baseline Duel', category: 'Tennis', image: TENNIS_COURT_IMAGE, subtitle: 'Center Arena Rally · Vadodara' },
   { id: 'g3', title: 'Pro Pickleball Kitchen Rally', category: 'Pickleball', image: PICKLEBALL_IMAGE, subtitle: 'Evening Competition Session' },
   { id: 'g4', title: 'BWF Teak Badminton Arena', category: 'Badminton', image: BADMINTON_GYM_IMAGE, subtitle: 'Championship Arena Competition' },
-  { id: 'g5', title: 'Athletic Conditioning & Cardio Zone', category: 'Gym', image: GYM_IMAGE, subtitle: 'Technogym & Free Weights' },
+  { id: 'g5', title: 'Gymnastics Arena', category: 'Gymnastics', image: GYMNASTICS_IMAGE, subtitle: 'Spring Floor & Foam Pit' },
+  { id: 'g7', title: 'Tiara Cafe & Lounge', category: 'Cafe', image: CAFE_IMAGE, subtitle: 'Post-Game Recovery & Refreshments' },
   { id: 'g6', title: 'Championship Trophy Cabinet', category: 'Heritage', image: TROPHY_IMAGE, subtitle: 'Clubhouse Exhibition Hall' }
+];
+
+export const GROWTH_CARDS = [
+  {
+    id: 'growth-courts',
+    icon: 'trophy',
+    title: 'Championship Courts',
+    description: '8 ITF tournament tennis courts, 8 BWF wooden badminton courts, and 4 dedicated USAPA pickleball courts.',
+  },
+  {
+    id: 'growth-coaching',
+    icon: 'users',
+    title: 'Certified Coaching',
+    description: 'Full-time national academy coaches for junior development squads, cardio clinics, and elite athletes.',
+  },
+  {
+    id: 'growth-hyrox',
+    icon: 'dumbbell',
+    title: 'Hyrox Fitness Box',
+    description: 'Purpose-built Hyrox training floor with sleds, SkiErgs, rowers, wall balls, and race-simulation heats.',
+  },
+  {
+    id: 'growth-floodlights',
+    icon: 'clock',
+    title: 'Night Floodlighting',
+    description: 'Broadcast-standard non-glare LED illumination across all courts, operational daily from 05:30 AM to 10:30 PM.',
+  },
+];
+
+export const CERTIFIED_COACHES: Coach[] = [
+  {
+    id: 'coach-badminton',
+    sportId: 'badminton',
+    role: 'Badminton Coach',
+    name: 'Badminton Head Coach',
+    certification: 'BWF Level Certified',
+    experience: '10+ years coaching',
+    image: COACH_PLACEHOLDER_IMAGE,
+    description: 'Leads our beginner-to-elite badminton squads with a focus on footwork patterns, smash power, deception, and match strategy on the BWF teak courts.',
+    specialities: ['Footwork & Court Movement', 'Smash & Net Play', 'Junior Development Squads'],
+  },
+  {
+    id: 'coach-tennis-pickleball',
+    sportId: 'tennis',
+    role: 'Tennis & Pickleball Coach',
+    name: 'Tennis & Pickleball Head Coach',
+    certification: 'AITA & Pickleball Certified',
+    experience: '10+ years coaching',
+    image: COACH_PLACEHOLDER_IMAGE,
+    description: 'Trains players across tennis and pickleball, from first-rally fundamentals to tournament preparation, covering strokes, serves, kitchen play, and doubles tactics.',
+    specialities: ['Strokes, Serves & Returns', 'Pickleball Dinks & Resets', 'Tournament Preparation'],
+  },
+  {
+    id: 'coach-hyrox',
+    sportId: 'hyrox',
+    role: 'Hyrox Coach',
+    name: 'Hyrox Head Coach',
+    certification: 'Certified Hyrox Trainer',
+    experience: '8+ years coaching',
+    image: COACH_PLACEHOLDER_IMAGE,
+    description: 'Designs race-ready Hyrox programs combining running economy, sled work, SkiErg, rowing, and wall ball conditioning for first-timers and competitive racers.',
+    specialities: ['Race Simulations', 'Strength & Running Endurance', 'Personal Training'],
+  },
+  {
+    id: 'coach-gymnastics',
+    sportId: 'gymnastics',
+    role: 'Gymnastics Coach',
+    name: 'Gymnastics Head Coach',
+    certification: 'Certified Gymnastics Coach',
+    experience: '10+ years coaching',
+    image: COACH_PLACEHOLDER_IMAGE,
+    description: 'Builds flexibility, strength, balance, and safe technique in kids, juniors, and adults through structured floor, beam, bars, and vault progressions.',
+    specialities: ['Floor, Beam & Bars', 'Flexibility & Body Control', 'Kids & Junior Batches'],
+  },
 ];

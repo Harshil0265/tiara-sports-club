@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calendar, CheckCircle2, Mail, Clock, Send, Copy, Check, Sparkles, Eye } from 'lucide-react';
 import { CLUB_FACILITIES, CLUB_LOCATION, ADMIN_EMAIL } from '../data/clubData';
 import { AdminEmailPreviewModal } from './AdminEmailPreviewModal';
 import { saveInquiryToStorage } from '../data/inquiryStorage';
+import { sendInquiryEmail } from '../data/inquiryEmail';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -26,6 +27,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   isDarkMode = true,
 }) => {
   const [selectedFacility, setSelectedFacility] = useState(defaultFacilityId);
+
+  useEffect(() => {
+    if (isOpen) setSelectedFacility(defaultFacilityId);
+  }, [isOpen, defaultFacilityId]);
   const [date, setDate] = useState(() => getTodayDateStr());
   
   // Custom flexible time selection: any start time + duration
@@ -41,6 +46,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showEmailPreview, setShowEmailPreview] = useState(false);
+  const [emailDelivered, setEmailDelivered] = useState<boolean | null>(null);
   const [confirmedInquiry, setConfirmedInquiry] = useState<{
     code: string;
     item: string;
@@ -60,7 +66,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     if (id === 'tennis-courts') return 'Tennis';
     if (id === 'pickleball-center') return 'Pickleball';
     if (id === 'badminton-arena') return 'Badminton';
-    if (id === 'fitness-gym') return 'Gym';
+    if (id === 'hyrox-fitness-box') return 'Hyrox Fitness Box';
+    if (id === 'gymnastics-arena') return 'Gymnastics';
+    if (id === 'cafe-lounge') return 'Cafe';
     return 'Tennis';
   };
 
@@ -138,12 +146,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
       saveInquiryToStorage(inquiryData);
 
-      // Dispatch via Zoho SMTP server endpoint
-      fetch('/api/send-inquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(inquiryData),
-      }).catch((err) => console.warn('Backend SMTP call failed:', err));
+      setEmailDelivered(null);
+      sendInquiryEmail(inquiryData).then(setEmailDelivered);
 
       setConfirmedInquiry({
         code: refCode,
@@ -246,10 +250,10 @@ Email: ${confirmedInquiry.email}`);
                 id="booking-modal-title"
                 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-tight"
               >
-                COURT, GYM & SLOT INQUIRY
+                SPORTS, FITNESS & SLOT INQUIRY
               </h2>
               <p className={`text-xs mt-1 ${isDarkMode ? 'text-neutral-400' : 'text-slate-500'}`}>
-                Ask any slot query for Tennis, Pickleball, Badminton, or Gym in Vadodara. Our admin team will receive your query with full schedule details.
+                Ask any slot query for Tennis, Pickleball, Badminton, Hyrox, Gymnastics, or Cafe in Vadodara. Our admin team will receive your query with full schedule details.
               </p>
             </div>
 
@@ -290,7 +294,7 @@ Email: ${confirmedInquiry.email}`);
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-1.5 text-neutral-300">
+                    <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-1.5 text-slate-600 dark:text-neutral-300">
                       <Calendar className="w-3.5 h-3.5 text-red-500 shrink-0" />
                       <span>Preferred Date</span>
                     </label>
@@ -308,7 +312,7 @@ Email: ${confirmedInquiry.email}`);
                   </div>
 
                   <div>
-                    <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-1.5 text-neutral-300">
+                    <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-1.5 text-slate-600 dark:text-neutral-300">
                       <Clock className="w-3.5 h-3.5 text-red-500 shrink-0" />
                       <span>Custom Start Time</span>
                     </label>
@@ -564,9 +568,9 @@ Email: ${confirmedInquiry.email}`);
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-2 pt-4">
-              <div className="w-full flex-1 py-3 bg-red-600 text-white font-bold text-xs uppercase tracking-wider rounded-xs text-center flex items-center justify-center gap-2 shadow-sm">
+              <div className={`w-full flex-1 py-3 text-white font-bold text-xs uppercase tracking-wider rounded-xs text-center flex items-center justify-center gap-2 shadow-sm ${emailDelivered === false ? 'bg-amber-600' : 'bg-red-600'}`}>
                 <Check className="w-4 h-4" />
-                <span>Successfully Sent</span>
+                <span>{emailDelivered === false ? 'Saved · Email Delayed, Please Call +91 98250 88900' : emailDelivered === null ? 'Sending Email...' : 'Successfully Sent'}</span>
               </div>
 
               <button

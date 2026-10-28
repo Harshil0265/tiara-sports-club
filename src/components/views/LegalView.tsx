@@ -96,7 +96,7 @@ export const LegalView: React.FC<LegalViewProps> = ({
               </h2>
               <p>
                 TIARA SPORTS CLUB (Vadodara, Gujarat) values your privacy. Member records,
-                biometric data from the fitness gym, and contact details are stored securely
+                biometric data from the Hyrox fitness box, and contact details are stored securely
                 and utilized strictly for club operations, tournament schedules, and slot reservations.
               </p>
             </>
@@ -123,7 +123,7 @@ export const LegalView: React.FC<LegalViewProps> = ({
               <p>
                 Tennis courts require appropriate non-marking tournament tennis shoes. Badminton
                 courts strictly require non-marking gum sole shoes. Clean non-marking sports trainers
-                are mandatory in the gym and fitness zones.
+                are mandatory in the Hyrox box, gymnastics arena, and fitness zones.
               </p>
             </>
           )}

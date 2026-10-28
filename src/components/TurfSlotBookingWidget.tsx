@@ -5,6 +5,8 @@ import {
   PICKLEBALL_IMAGE,
   BADMINTON_GYM_IMAGE,
   GYM_IMAGE,
+  GYMNASTICS_IMAGE,
+  CAFE_IMAGE,
   CLUB_LOCATION,
   ADMIN_EMAIL,
 } from '../data/clubData';
@@ -27,13 +29,16 @@ import {
 } from 'lucide-react';
 import { AdminEmailPreviewModal, EmailData } from './AdminEmailPreviewModal';
 import { saveInquiryToStorage } from '../data/inquiryStorage';
+import { sendInquiryEmail } from '../data/inquiryEmail';
 
 interface TurfSlotBookingWidgetProps {
   onOpenBooking?: (facilityId?: string) => void;
   isDarkMode?: boolean;
 }
 
-type FacilityCategory = 'tennis' | 'pickleball' | 'badminton' | 'gym';
+type FacilityCategory = 'tennis' | 'pickleball' | 'badminton' | 'hyrox' | 'gymnastics' | 'cafe';
+
+const FACILITY_CATEGORIES: FacilityCategory[] = ['tennis', 'pickleball', 'badminton', 'hyrox', 'gymnastics', 'cafe'];
 
 interface SubmittedInquiry {
   inquiryId: string;
@@ -78,6 +83,7 @@ export const TurfSlotBookingWidget: React.FC<TurfSlotBookingWidgetProps> = ({
   const [submittedInquiry, setSubmittedInquiry] = useState<SubmittedInquiry | null>(null);
   const [copiedNotification, setCopiedNotification] = useState<boolean>(false);
   const [showEmailPreview, setShowEmailPreview] = useState<boolean>(false);
+  const [emailDelivered, setEmailDelivered] = useState<boolean | null>(null);
 
   const sportsDetails: Record<FacilityCategory, {
     facilityId: string;
@@ -135,19 +141,47 @@ export const TurfSlotBookingWidget: React.FC<TurfSlotBookingWidgetProps> = ({
       badge: 'BWF CERTIFIED TEAK',
       features: ['32ft High Ceiling Clearance', 'Yonex Stringing Machine On-Site', 'Fully Air-Cooled Hall'],
     },
-    gym: {
-      facilityId: 'fitness-gym',
-      name: 'Gym',
-      dimensions: 'Comprehensive Strength & Conditioning Floor',
-      surface: 'Swedish Barbell Drop Platforms & Sprint Turf',
+    hyrox: {
+      facilityId: 'hyrox-fitness-box',
+      name: 'Hyrox Fitness Box',
+      dimensions: 'Hyrox Race-Simulation Training Floor',
+      surface: 'Sled Lanes, SkiErg, Rowers & Running Loop',
       lighting: 'Atmospheric Architectural Daylight Lighting',
       pricePerHour: 'From ₹350 / Day Pass',
       singlePrice: '₹350 (Day Pass)',
       multiplePrice: 'Full Access (Member)',
       image: GYM_IMAGE,
       status: 'Open 06:00 - 23:00 Daily',
-      badge: 'STRENGTH & BIOMECHANICS',
-      features: ['Technogym Skill Line Cardio', 'Power Racks & Dumbbell Suite', 'Contrast Ice Bath Suite'],
+      badge: 'HYROX RACE TRAINING',
+      features: ['Sled Push & Pull Lanes', 'SkiErg, Rower & Wall Balls', 'Certified Hyrox Coaches'],
+    },
+    gymnastics: {
+      facilityId: 'gymnastics-arena',
+      name: 'Gymnastics',
+      dimensions: 'Dedicated Gymnastics Arena',
+      surface: 'Sprung Competition Floor, Beam, Bars & Foam Pit',
+      lighting: 'Bright Shadow-Free Arena Lighting',
+      pricePerHour: '₹400 - ₹500/session',
+      singlePrice: '₹400/session (Kids)',
+      multiplePrice: '₹500/session (Adult)',
+      image: GYMNASTICS_IMAGE,
+      status: 'Batches Open Morning & Evening',
+      badge: 'SPRUNG FLOOR & FOAM PIT',
+      features: ['Kids & Junior Batches', 'Foam Pit & Tumble Track', 'Certified Gymnastics Coaches'],
+    },
+    cafe: {
+      facilityId: 'cafe-lounge',
+      name: 'Cafe',
+      dimensions: 'Tiara Cafe & Member Lounge',
+      surface: 'Indoor Lounge & Outdoor Deck Seating',
+      lighting: 'Warm Ambient Lounge Lighting',
+      pricePerHour: 'Table Reservations Free',
+      singlePrice: 'Free (Table Booking)',
+      multiplePrice: 'Group & Party Orders',
+      image: CAFE_IMAGE,
+      status: 'Open 06:00 - 23:00 Daily',
+      badge: 'CLUBHOUSE CAFE & LOUNGE',
+      features: ['Protein Shakes & Fresh Juices', 'Healthy Meals & Snacks', 'Court-View Seating Lounge'],
     },
   };
 
@@ -242,12 +276,8 @@ export const TurfSlotBookingWidget: React.FC<TurfSlotBookingWidgetProps> = ({
 
       saveInquiryToStorage(inquiry);
 
-      // Dispatch via Zoho SMTP server endpoint
-      fetch('/api/send-inquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(inquiry),
-      }).catch((err) => console.warn('Backend SMTP call failed:', err));
+      setEmailDelivered(null);
+      sendInquiryEmail(inquiry).then(setEmailDelivered);
 
       setSubmittedInquiry(inquiry);
       setIsSubmitting(false);
@@ -339,13 +369,13 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
 
       <div className="p-6 sm:p-8 space-y-8">
         {/* Title & Sport Selector Tabs */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex flex-col gap-6">
           <div>
             <span className="text-red-600 font-mono text-xs font-bold uppercase tracking-widest block">
-              CHAMPIONSHIP COURTS & GYM · VADODARA
+              COURTS, FITNESS & CAFE · VADODARA
             </span>
             <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight mt-1">
-              COURT, GYM & SLOT INQUIRY
+              SPORTS, FITNESS & SLOT INQUIRY
             </h3>
             <p className={`text-xs sm:text-sm mt-1 ${isDarkMode ? 'text-neutral-400' : 'text-slate-600'}`}>
               Select any custom time what you want, ask your query, and our admin team will receive an instant email notification.
@@ -354,18 +384,18 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
 
           {/* Sport Switcher */}
           <div
-            className={`flex flex-wrap items-center gap-1 p-1 border rounded-xs shrink-0 ${
+            className={`flex items-center gap-1 p-1 border rounded-xs w-full overflow-x-auto no-scrollbar ${
               isDarkMode ? 'bg-neutral-950 border-neutral-800' : 'bg-slate-100 border-slate-300'
             }`}
           >
-            {(['tennis', 'pickleball', 'badminton', 'gym'] as FacilityCategory[]).map((sport) => (
+            {FACILITY_CATEGORIES.map((sport) => (
               <button
                 key={sport}
                 onClick={() => {
                   setSelectedSport(sport);
                   if (submittedInquiry) setSubmittedInquiry(null);
                 }}
-                className={`px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xs transition-all cursor-pointer ${
+                className={`flex-1 whitespace-nowrap px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-xs transition-all cursor-pointer ${
                   selectedSport === sport
                     ? 'bg-red-600 text-white shadow-xs font-black'
                     : isDarkMode
@@ -373,13 +403,7 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
                     : 'text-slate-700 hover:text-slate-900'
                 }`}
               >
-                {sport === 'tennis'
-                  ? 'Tennis'
-                  : sport === 'pickleball'
-                  ? 'Pickleball'
-                  : sport === 'badminton'
-                  ? 'Badminton'
-                  : 'Gym'}
+                {sportsDetails[sport].name}
               </button>
             ))}
           </div>
@@ -469,7 +493,7 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
               </span>
               <ul className="space-y-1 text-xs">
                 {current.features.map((feat, idx) => (
-                  <li key={idx} className="flex items-center gap-1.5 text-neutral-300">
+                  <li key={idx} className="flex items-center gap-1.5 text-slate-700 dark:text-neutral-300">
                     <CheckCircle2 className="w-3.5 h-3.5 text-red-500 shrink-0" />
                     <span className="text-[11px]">{feat}</span>
                   </li>
@@ -524,7 +548,7 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-neutral-300 mb-1.5">
+                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-slate-600 dark:text-neutral-300 mb-1.5">
                         <Calendar className="w-3.5 h-3.5 text-red-500 shrink-0" />
                         <span>Preferred Date</span>
                       </label>
@@ -542,7 +566,7 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
                     </div>
 
                     <div>
-                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-neutral-300 mb-1.5">
+                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-slate-600 dark:text-neutral-300 mb-1.5">
                         <Clock className="w-3.5 h-3.5 text-red-500 shrink-0" />
                         <span>Custom Start Time</span>
                       </label>
@@ -648,7 +672,7 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
                     <option value="Coaching & Trials">Coaching / Private Academy Trial</option>
                     <option value="Group / Corporate Booking">Group / Corporate Multi-Court Session</option>
                     <option value="Equipment & Rackets">Equipment Rental / Stringing Inquiries</option>
-                    <option value="Membership Plans">Full Club & Gym Membership Plans</option>
+                    <option value="Membership Plans">Full Club Membership Plans</option>
                   </select>
                 </div>
 
@@ -853,9 +877,9 @@ Location: Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pu
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-2 pt-4">
-                  <div className="w-full flex-1 py-3 bg-red-600 text-white font-bold text-xs uppercase tracking-wider rounded-xs text-center flex items-center justify-center gap-2 shadow-sm">
+                  <div className={`w-full flex-1 py-3 text-white font-bold text-xs uppercase tracking-wider rounded-xs text-center flex items-center justify-center gap-2 shadow-sm ${emailDelivered === false ? 'bg-amber-600' : 'bg-red-600'}`}>
                     <Check className="w-4 h-4" />
-                    <span>Successfully Sent</span>
+                    <span>{emailDelivered === false ? 'Saved · Email Delayed, Please Call +91 98250 88900' : emailDelivered === null ? 'Sending Email...' : 'Successfully Sent'}</span>
                   </div>
 
                   <button

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dumbbell, Waves, Target, Trophy, Activity, Zap } from 'lucide-react';
+import { Dumbbell, Coffee, PersonStanding, Activity } from 'lucide-react';
 
 interface SportIconProps {
   sportId: string;
@@ -87,6 +87,18 @@ export const GymIcon: React.FC<{ className?: string; size?: number }> = ({
   size = 20,
 }) => <Dumbbell className={className} size={size} />;
 
+export const HyroxIcon: React.FC<{ className?: string; size?: number }> = GymIcon;
+
+export const GymnasticsIcon: React.FC<{ className?: string; size?: number }> = ({
+  className = 'w-5 h-5',
+  size = 20,
+}) => <PersonStanding className={className} size={size} />;
+
+export const CafeIcon: React.FC<{ className?: string; size?: number }> = ({
+  className = 'w-5 h-5',
+  size = 20,
+}) => <Coffee className={className} size={size} />;
+
 export const SportIcon: React.FC<SportIconProps> = ({
   sportId,
   className = 'w-5 h-5',
@@ -103,10 +115,14 @@ export const SportIcon: React.FC<SportIconProps> = ({
     case 'badminton arena':
     case 'badminton center':
       return <BadmintonIcon className={className} size={size} />;
+    case 'hyrox':
+    case 'hyrox fitness box':
     case 'gym':
-    case 'fitness & gym':
-    case 'high-performance gym':
-      return <GymIcon className={className} size={size} />;
+      return <HyroxIcon className={className} size={size} />;
+    case 'gymnastics':
+      return <GymnasticsIcon className={className} size={size} />;
+    case 'cafe':
+      return <CafeIcon className={className} size={size} />;
     default:
       return <Activity className={className} size={size} />;
   }

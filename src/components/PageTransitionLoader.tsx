@@ -16,7 +16,9 @@ export const PageTransitionLoader: React.FC<PageTransitionLoaderProps> = ({
     { id: 'tennis', label: 'Tennis' },
     { id: 'pickleball', label: 'Pickleball' },
     { id: 'badminton', label: 'Badminton' },
-    { id: 'gym', label: 'Gym' },
+    { id: 'hyrox', label: 'Hyrox' },
+    { id: 'gymnastics', label: 'Gymnastics' },
+    { id: 'cafe', label: 'Cafe' },
   ];
 
   useEffect(() => {

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" role="img" aria-label="Coach photo placeholder">
+  <rect width="600" height="750" fill="#1c1c1f"/>
+  <circle cx="300" cy="270" r="105" fill="#34343a"/>
+  <path d="M95 750c0-140 90-235 205-235s205 95 205 235z" fill="#34343a"/>
+  <text x="300" y="690" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="24" letter-spacing="5" fill="#8a8a94">PHOTO COMING SOON</text>
+</svg>

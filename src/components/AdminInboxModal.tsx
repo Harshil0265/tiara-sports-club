@@ -100,7 +100,7 @@ export const AdminInboxModal: React.FC<AdminInboxModalProps> = ({
           }`}
         >
           <div className="flex items-center gap-1.5 overflow-x-auto">
-            {['all', 'tennis', 'pickleball', 'badminton', 'gym'].map((f) => (
+            {['all', 'tennis', 'pickleball', 'badminton', 'hyrox', 'gymnastics', 'cafe'].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilterSport(f)}

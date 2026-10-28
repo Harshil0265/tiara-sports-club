@@ -7,6 +7,10 @@ import {
   TENNIS_COURT_IMAGE,
   TROPHY_IMAGE,
   ARENA_COMPLEX_IMAGE,
+  GYMNASTICS_IMAGE,
+  CAFE_IMAGE,
+  GROWTH_CARDS,
+  CERTIFIED_COACHES,
   MULTI_SPORTS_LIST,
   RECENT_MATCH_RESULTS,
   STANDINGS_DATA,
@@ -32,14 +36,24 @@ import {
   Thermometer,
   Building2,
   Car,
+  Users,
+  Dumbbell,
 } from 'lucide-react';
 import { SportIcon } from '../SportsThemeIcon';
+import { BrandBar } from '../BrandBar';
+import { LOGO, getSportColor, GROWTH_COLORS } from '../../theme/logoTheme';
+import TIARA_LOGO from '../../assets/images/tiara-logo.png';
+import COACH_DARK from '../../assets/images/coach_placeholder_dark.svg';
 import { TurfSlotBookingWidget } from '../TurfSlotBookingWidget';
 
 const HERO_ARENAS = [
   {
     id: 'tennis',
     name: 'Tennis Championship Arena',
+    shortName: 'Tennis',
+    ribbonTitle: 'TOURNAMENT ARENA',
+    ribbonSub: 'Tennis',
+    ribbonDesc: 'Championship Tournament Decks',
     category: 'Tennis Center',
     badge: 'PRO TOURNAMENT REGULATION',
     image: TENNIS_COURT_IMAGE,
@@ -47,11 +61,15 @@ const HERO_ARENAS = [
     lighting: '1,200 LUX Anti-Glare High-Mast LED Array',
     courtCount: 'Championship Tournament Arena',
     schedule: 'Open sessions daily from 06:00',
-    facilityId: 'fac-tennis',
+    facilityId: 'tennis-courts',
   },
   {
     id: 'pickleball',
     name: 'Pro Pickleball Arena',
+    shortName: 'Pickleball',
+    ribbonTitle: 'PRO ARENA',
+    ribbonSub: 'Pickleball Arena',
+    ribbonDesc: 'USAPA Cushioned Acrylic',
     category: 'Pickleball Hub',
     badge: 'PRO REGULATION ARENA',
     image: PICKLEBALL_IMAGE,
@@ -59,11 +77,15 @@ const HERO_ARENAS = [
     lighting: '800 LUX Tournament Indirect Illumination',
     courtCount: 'Competition Pickleball Arena',
     schedule: 'Doubles open play daily from 18:00',
-    facilityId: 'fac-pickleball',
+    facilityId: 'pickleball-center',
   },
   {
     id: 'badminton',
     name: 'BWF Teak Wood Badminton Hall',
+    shortName: 'Badminton',
+    ribbonTitle: 'BWF TEAK HALL',
+    ribbonSub: 'BWF Badminton',
+    ribbonDesc: 'Sprung Teak Wood Flooring',
     category: 'Badminton Hall',
     badge: 'SPRUNG TEAK WOOD FLOORING',
     image: BADMINTON_GYM_IMAGE,
@@ -71,19 +93,55 @@ const HERO_ARENAS = [
     lighting: '900 LUX Shadowless Overhead Grid',
     courtCount: 'BWF Certified Teak Arena',
     schedule: 'Sessions available for morning & evening',
-    facilityId: 'fac-badminton',
+    facilityId: 'badminton-arena',
   },
   {
-    id: 'gym',
-    name: 'Gym',
-    category: 'Strength & Biomechanics Suite',
-    badge: 'HIGH-PERFORMANCE GYM',
+    id: 'hyrox',
+    name: 'Hyrox Fitness Box',
+    shortName: 'Hyrox',
+    category: 'Hyrox Training Box',
+    badge: 'HYROX RACE TRAINING',
     image: GYM_IMAGE,
-    surface: 'Swedish Eleiko Lifting Platforms & Hammer Strength Iso-Lateral',
+    surface: 'Sled Lanes, SkiErg, Rowers, Wall Balls & Running Loop',
     lighting: 'Circadian Athletic Performance Lighting',
-    courtCount: 'Strength & Conditioning Floor',
+    courtCount: 'Hyrox Race-Simulation Floor',
     schedule: 'Open 06:00 – 22:30 Daily',
-    facilityId: 'fac-gym',
+    facilityId: 'hyrox-fitness-box',
+    ribbonTitle: 'HYROX BOX',
+    ribbonSub: 'Hyrox Fitness Box',
+    ribbonDesc: 'Sleds, SkiErg & Race Heats',
+  },
+  {
+    id: 'gymnastics',
+    name: 'Gymnastics Arena',
+    shortName: 'Gymnastics',
+    category: 'Gymnastics Center',
+    badge: 'SPRUNG FLOOR & FOAM PIT',
+    image: GYMNASTICS_IMAGE,
+    surface: 'Sprung Competition Floor, Beams, Bars & Vault',
+    lighting: 'Bright Shadow-Free Arena Lighting',
+    courtCount: 'Dedicated Gymnastics Arena',
+    schedule: 'Morning & Evening Batches',
+    facilityId: 'gymnastics-arena',
+    ribbonTitle: 'SPRUNG FLOOR',
+    ribbonSub: 'Gymnastics',
+    ribbonDesc: 'Kids, Junior & Adult Batches',
+  },
+  {
+    id: 'cafe',
+    name: 'Tiara Cafe & Lounge',
+    shortName: 'Cafe',
+    category: 'Clubhouse Cafe',
+    badge: 'POST-GAME RECOVERY & REFRESHMENTS',
+    image: CAFE_IMAGE,
+    surface: 'Protein Shakes, Fresh Juices, Coffee & Healthy Meals',
+    lighting: 'Warm Ambient Lounge Lighting',
+    courtCount: 'Court-View Member Lounge',
+    schedule: 'Open 06:00 – 23:00 Daily',
+    facilityId: 'cafe-lounge',
+    ribbonTitle: 'CLUB CAFE',
+    ribbonSub: 'Cafe & Lounge',
+    ribbonDesc: 'Shakes, Coffee & Healthy Bites',
   },
 ];
 
@@ -100,6 +158,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
 }) => {
   const [heroActiveArenaIndex, setHeroActiveArenaIndex] = useState<number>(0);
   const [selectedSportTab, setSelectedSportTab] = useState<string>('tennis');
+  const [activeSportId, setActiveSportId] = useState<string>('tennis');
+  const activeSport = MULTI_SPORTS_LIST.find((x) => x.id === activeSportId) || MULTI_SPORTS_LIST[0];
+  const activeColor = getSportColor(activeSport.id, isDarkMode);
   const [selectedTournament, setSelectedTournament] = useState<'Champions Cup' | 'EFA Cup' | 'Liga Premier'>('Champions Cup');
   const [selectedTimelineYear, setSelectedTimelineYear] = useState<number>(2024);
   const [selectedMatchResultIndex, setSelectedMatchResultIndex] = useState<number>(0);
@@ -119,460 +180,231 @@ export const HomeView: React.FC<HomeViewProps> = ({
         isDarkMode ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-slate-900'
       }`}
     >
-      {/* 1. HERO SECTION - Senior Designer Multi-Sport Architectural Stage */}
-      <section
-        className={`relative overflow-hidden border-b pt-8 pb-14 lg:pt-14 lg:pb-20 ${
-          isDarkMode
-            ? 'bg-neutral-950 border-neutral-900'
-            : 'bg-white border-slate-200'
-        }`}
-      >
-        {/* Subtle architectural athletic grid */}
+      {/* 1. HERO SECTION (logo-colour theme) */}
+      <section className="relative overflow-hidden bg-white dark:bg-neutral-950">
+        <img
+          src={TIARA_LOGO}
+          alt=""
+          aria-hidden="true"
+          className="absolute -right-40 -top-32 w-[680px] opacity-[0.06] pointer-events-none select-none hidden lg:block"
+        />
         <div
-          className={`absolute inset-0 pointer-events-none opacity-[0.04] ${
-            isDarkMode ? 'invert-0' : 'invert'
-          }`}
+          className="absolute inset-x-0 top-0 h-full pointer-events-none"
           style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #dc2626 1px, transparent 0)`,
-            backgroundSize: '24px 24px',
+            background:
+              'radial-gradient(ellipse at 15% 0%, rgba(0,148,68,0.10), transparent 55%), radial-gradient(ellipse at 90% 30%, rgba(247,148,30,0.12), transparent 50%)',
           }}
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Column: Bold Multi-Sport Athletic Editorial Typography */}
-            <div className="lg:col-span-6 space-y-5">
-              <div className="flex flex-wrap items-center gap-2">
-                <div
-                  className={`inline-flex items-center gap-2 px-3 py-1 border text-[11px] font-mono font-bold uppercase tracking-widest rounded-xs ${
-                    isDarkMode
-                      ? 'bg-red-600/10 border-red-600/30 text-red-500'
-                      : 'bg-red-50 border-red-200 text-red-600'
-                  }`}
-                >
-                  <Flame className="w-3.5 h-3.5 text-red-600 animate-pulse" />
-                  <span>PREMIER 12-ACRE ATHLETIC CAMPUS · VADODARA</span>
-                </div>
-                <span className={`text-[11px] font-mono font-bold uppercase ${isDarkMode ? 'text-neutral-500' : 'text-slate-400'}`}>
-                  EST. 2012
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className={`block font-mono text-xs uppercase tracking-widest font-bold ${isDarkMode ? 'text-neutral-400' : 'text-slate-500'}`}>
-                  GUJARAT'S FLAGSHIP MULTI-SPORT INSTITUTION
-                </span>
-                <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight leading-[0.92]">
-                  TIARA SPORTS CLUB <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-amber-400">
-                    VADODARA, GUJARAT
-                  </span>
-                </h1>
-                <p className={`text-base sm:text-lg font-bold tracking-tight mt-2 ${isDarkMode ? 'text-neutral-300' : 'text-slate-700'}`}>
-                  TENNIS · PRO PICKLEBALL · BWF BADMINTON · GYM
-                </p>
-              </div>
-
-              <p
-                className={`text-xs sm:text-sm leading-relaxed max-w-xl ${
-                  isDarkMode ? 'text-neutral-400' : 'text-slate-600'
-                }`}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <div className="lg:col-span-6 space-y-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest text-white"
+                style={{ backgroundColor: LOGO.green }}
               >
-                Tiara Sports Club, Besides Red Coral greens, opposite Nayara petrol pump, Sama-Savli Road Vadodara. Vadodara’s premier destination for competitive athletes and sports lovers. 
-                Featuring international championship tennis facilities, dedicated pickleball arenas, 
-                BWF teak badminton halls, and a high-performance gym facility.
-              </p>
-
-              {/* Action Buttons Row */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
-                <button
-                  onClick={() => onOpenBooking(activeHeroArena.facilityId)}
-                  className="px-6 py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-widest rounded-xs transition-all shadow-xl shadow-red-600/25 cursor-pointer flex items-center gap-2 group"
-                >
-                  <span>SLOT & FACILITY INQUIRY</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <button
-                  onClick={() => onNavigate('contact')}
-                  className={`px-5 py-3.5 font-bold text-xs uppercase tracking-widest rounded-xs transition-all cursor-pointer flex items-center gap-2 border ${
-                    isDarkMode
-                      ? 'bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border-neutral-700'
-                      : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300 shadow-xs'
-                  }`}
-                >
-                  <MapPin className="w-4 h-4 text-red-500" />
-                  <span>GOOGLE MAP & VENUE</span>
-                </button>
-
-                <button
-                  onClick={() => onNavigate('facilities')}
-                  className={`px-4 py-3.5 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer flex items-center gap-1.5 ${
-                    isDarkMode ? 'text-neutral-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <ChevronRight className="w-3.5 h-3.5 text-red-500" />
-                  <span>ALL FACILITIES</span>
-                </button>
-              </div>
-
-              {/* Live Campus Telemetry Strip */}
-              <div
-                className={`p-3.5 rounded-xs border text-xs font-mono space-y-1.5 ${
-                  isDarkMode ? 'bg-neutral-900/60 border-neutral-800' : 'bg-slate-50 border-slate-200'
-                }`}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className={`font-bold uppercase text-[11px] ${isDarkMode ? 'text-neutral-200' : 'text-slate-800'}`}>
-                      CAMPUS ACTIVE · COURTS OPEN TILL 23:00 IST
-                    </span>
-                  </div>
-                  <span className="text-red-500 font-bold text-[11px]">
-                    SAMA-SAVLI ROAD, VADODARA
-                  </span>
-                </div>
-                <div className={`text-[11px] flex flex-wrap items-center gap-3 ${isDarkMode ? 'text-neutral-400' : 'text-slate-500'}`}>
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Thermometer className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    28°C Vadodara Live
-                  </span>
-                  <span className="opacity-40">·</span>
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Building2 className="w-3.5 h-3.5 text-red-500 shrink-0" />
-                    16+ Championship Arenas
-                  </span>
-                  <span className="opacity-40">·</span>
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Car className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    200+ Free Parking Bays
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Senior Designer Dynamic Stadium Viewport & Arena Console */}
-            <div className="lg:col-span-6 space-y-3">
-              {/* Arena Channel Switcher Tabs */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                {HERO_ARENAS.map((arena, index) => {
-                  const isActive = heroActiveArenaIndex === index;
-                  return (
-                    <button
-                      key={arena.id}
-                      onClick={() => setHeroActiveArenaIndex(index)}
-                      className={`px-3 py-1.5 rounded-xs text-[11px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                        isActive
-                          ? 'bg-red-600 text-white shadow-sm'
-                          : isDarkMode
-                          ? 'bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white border border-neutral-800'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-                      }`}
-                    >
-                      <span className={isActive ? 'text-white' : 'text-red-500'}>0{index + 1}</span>
-                      <span>{arena.id === 'tennis' ? 'Tennis' : arena.id === 'pickleball' ? 'Pickleball' : arena.id === 'badminton' ? 'Badminton' : 'Gym'}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Main Stadium Console Stage */}
-              <div
-                className={`relative rounded-xs overflow-hidden border shadow-2xl transition-all ${
-                  isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-slate-900 border-slate-700'
-                }`}
-              >
-                {/* Stadium Photography Viewport */}
-                <div className="relative h-[380px] sm:h-[430px] w-full overflow-hidden">
-                  <img
-                    src={activeHeroArena.image}
-                    alt={activeHeroArena.name}
-                    className="w-full h-full object-cover object-center transition-all duration-700 filter brightness-95 contrast-105"
-                    referrerPolicy="no-referrer"
-                  />
-                  {/* Subtle athletic gradient vignette */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/40 via-transparent to-neutral-950/20" />
-
-                  {/* Top HUD Badge */}
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
-                    <div className="px-3 py-1 bg-black/75 backdrop-blur-md border border-white/10 rounded-xs text-[10px] font-mono font-bold tracking-widest text-red-400 uppercase">
-                      {activeHeroArena.badge}
-                    </div>
-                    <div className="px-3 py-1 bg-emerald-950/80 backdrop-blur-md border border-emerald-500/30 rounded-xs text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                      <span>{activeHeroArena.courtCount}</span>
-                    </div>
-                  </div>
-
-                  {/* Bottom Architectural HUD Console */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-                      <div>
-                        <span className="text-[10px] font-mono font-bold tracking-widest text-red-500 uppercase block">
-                          TIARA VENUE SPOTLIGHT · VADODARA
-                        </span>
-                        <h3 className="font-display text-xl sm:text-2xl font-black uppercase text-white tracking-tight">
-                          {activeHeroArena.name}
-                        </h3>
-                        <p className="text-[11px] text-neutral-300 font-mono mt-0.5 line-clamp-1">
-                          Surface: {activeHeroArena.surface}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => onOpenBooking(activeHeroArena.facilityId)}
-                        className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-wider rounded-xs cursor-pointer shrink-0 transition-colors flex items-center gap-1.5 shadow-md shadow-red-600/30"
-                      >
-                        <span>Reserve Arena</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* Arena Specs Telemetry Bar */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-white/10 text-[10px] font-mono text-neutral-300">
-                      <div>
-                        <span className="text-neutral-500 block uppercase">LIGHTING</span>
-                        <span className="font-bold truncate block">{activeHeroArena.lighting}</span>
-                      </div>
-                      <div>
-                        <span className="text-neutral-500 block uppercase">AVAILABILITY</span>
-                        <span className="font-bold text-emerald-400 truncate block">{activeHeroArena.schedule}</span>
-                      </div>
-                      <div className="hidden sm:block">
-                        <span className="text-neutral-500 block uppercase">LOCATION</span>
-                        <span className="font-bold truncate block">Vadodara Campus</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom 4-Discipline Metric Ribbon */}
-          <div
-            className={`pt-8 border-t grid grid-cols-2 sm:grid-cols-4 gap-4 ${
-              isDarkMode ? 'border-neutral-900' : 'border-slate-200'
-            }`}
-          >
-            <div 
-              onClick={() => { setHeroActiveArenaIndex(0); }}
-              className={`p-3 rounded-xs border transition-all cursor-pointer ${
-                heroActiveArenaIndex === 0
-                  ? 'border-red-600 bg-red-600/10'
-                  : isDarkMode ? 'border-neutral-900 bg-neutral-900/30 hover:border-neutral-800' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
-              }`}
-            >
-              <div className="font-display text-xl font-black text-red-600 uppercase">
-                TOURNAMENT ARENA
-              </div>
-              <div className={`text-[11px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-neutral-200' : 'text-slate-800'}`}>
-                Tennis
-              </div>
-              <div className={`text-[10px] font-mono ${isDarkMode ? 'text-neutral-500' : 'text-slate-500'}`}>
-                Championship Tournament Decks
-              </div>
-            </div>
-
-            <div 
-              onClick={() => { setHeroActiveArenaIndex(1); }}
-              className={`p-3 rounded-xs border transition-all cursor-pointer ${
-                heroActiveArenaIndex === 1
-                  ? 'border-red-600 bg-red-600/10'
-                  : isDarkMode ? 'border-neutral-900 bg-neutral-900/30 hover:border-neutral-800' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
-              }`}
-            >
-              <div className="font-display text-xl font-black text-red-600 uppercase">
-                PRO ARENA
-              </div>
-              <div className={`text-[11px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-neutral-200' : 'text-slate-800'}`}>
-                Pickleball Arena
-              </div>
-              <div className={`text-[10px] font-mono ${isDarkMode ? 'text-neutral-500' : 'text-slate-500'}`}>
-                USAPA Cushioned Acrylic
-              </div>
-            </div>
-
-            <div 
-              onClick={() => { setHeroActiveArenaIndex(2); }}
-              className={`p-3 rounded-xs border transition-all cursor-pointer ${
-                heroActiveArenaIndex === 2
-                  ? 'border-red-600 bg-red-600/10'
-                  : isDarkMode ? 'border-neutral-900 bg-neutral-900/30 hover:border-neutral-800' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
-              }`}
-            >
-              <div className="font-display text-xl font-black text-red-600 uppercase">
-                BWF TEAK HALL
-              </div>
-              <div className={`text-[11px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-neutral-200' : 'text-slate-800'}`}>
-                BWF Badminton
-              </div>
-              <div className={`text-[10px] font-mono ${isDarkMode ? 'text-neutral-500' : 'text-slate-500'}`}>
-                Sprung Teak Wood Flooring
-              </div>
-            </div>
-
-            <div 
-              onClick={() => { setHeroActiveArenaIndex(3); }}
-              className={`p-3 rounded-xs border transition-all cursor-pointer ${
-                heroActiveArenaIndex === 3
-                  ? 'border-red-600 bg-red-600/10'
-                  : isDarkMode ? 'border-neutral-900 bg-neutral-900/30 hover:border-neutral-800' : 'border-slate-200 bg-slate-50 hover:border-slate-300'
-              }`}
-            >
-              <div className="font-display text-xl font-black text-red-600 uppercase">
-                STRENGTH SUITE
-              </div>
-              <div className={`text-[11px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-neutral-200' : 'text-slate-800'}`}>
-                Gym & Conditioning
-              </div>
-              <div className={`text-[10px] font-mono ${isDarkMode ? 'text-neutral-500' : 'text-slate-500'}`}>
-                Swedish Barbell Decks & Iso-Lateral
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. MULTI-SPORTS EXPLORER MODULE (Task 3 & 6) */}
-      <section
-        className={`py-16 sm:py-20 border-b ${
-          isDarkMode
-            ? 'bg-neutral-900/40 border-neutral-900'
-            : 'bg-white border-slate-200'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <span className="text-red-600 text-xs font-bold uppercase tracking-widest block font-mono">
-                EVERY DISCIPLINE · WORLD-CLASS STANDARDS
+                <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-neutral-900 animate-pulse" />
+                Premier 12-Acre Athletic Campus
               </span>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight mt-1">
-                OUR SPORTS DISCIPLINES AT TIARA
-              </h2>
-              <p
-                className={`text-xs sm:text-sm mt-2 max-w-xl ${
-                  isDarkMode ? 'text-neutral-400' : 'text-slate-600'
-                }`}
-              >
-                Select a sport to explore court specifications, floodlighting, training academies, and
-                live booking availability.
-              </p>
+              <span className="text-[11px] font-mono font-bold text-black/50 dark:text-white/65">EST. 2012</span>
             </div>
 
-            {/* Sport Tab Switchers */}
-            <div
-              className={`flex items-center gap-1 p-1 border rounded-xs flex-wrap ${
-                isDarkMode ? 'bg-neutral-950 border-neutral-800' : 'bg-slate-100 border-slate-300'
-              }`}
-            >
-              {MULTI_SPORTS_LIST.map((sport) => (
-                <button
-                  key={sport.id}
-                  onClick={() => setSelectedSportTab(sport.id)}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-xs transition-all cursor-pointer flex items-center gap-1.5 ${
-                    selectedSportTab === sport.id
-                      ? 'bg-red-600 text-white shadow-xs'
-                      : isDarkMode
-                      ? 'text-neutral-400 hover:text-white'
-                      : 'text-slate-700 hover:text-slate-900'
-                  }`}
+            <div>
+              <h1 className="font-display text-5xl sm:text-7xl font-black uppercase leading-[0.92] tracking-tight">
+                Tiara Sports Club
+              </h1>
+              <h2
+                className="font-display text-4xl sm:text-6xl font-black uppercase leading-[0.95] tracking-tight mt-1"
+                style={{ color: LOGO.vermilion }}
+              >
+                Vadodara, Gujarat
+              </h2>
+              <div className="mt-4 w-40">
+                <BrandBar className="h-1.5 rounded-full overflow-hidden" />
+              </div>
+            </div>
+
+            <p className="text-sm sm:text-base leading-relaxed text-black/70 dark:text-white/70 max-w-xl">
+              Gujarat's flagship multi-sport institution on Sama-Savli Road, besides Red Coral greens, opposite Nayara petrol pump.
+              Championship tennis, pro pickleball, BWF badminton, a Hyrox fitness box, a gymnastics arena, and the Tiara cafe, all in one campus.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => onOpenBooking(activeSport.facilityId)}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-md text-xs font-extrabold uppercase tracking-widest text-white shadow-lg transition-transform hover:-translate-y-0.5 cursor-pointer"
+                style={isDarkMode ? { backgroundColor: LOGO.blue } : { backgroundColor: LOGO.navy }}
+              >
+                Slot & Facility Inquiry <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onNavigate('contact')}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-md text-xs font-extrabold uppercase tracking-widest border-2 border-[#0B0B0B] dark:border-white hover:bg-[#0B0B0B] hover:text-white dark:hover:bg-white dark:hover:text-[#0B0B0B] transition-colors cursor-pointer"
+              >
+                <MapPin className="w-4 h-4" style={{ color: LOGO.vermilion }} />
+                Google Map & Venue
+              </button>
+              <button
+                onClick={() => onNavigate('facilities')}
+                className="inline-flex items-center gap-1.5 px-3 py-3.5 text-xs font-extrabold uppercase tracking-widest text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white cursor-pointer"
+              >
+                <ChevronRight className="w-3.5 h-3.5" style={{ color: LOGO.vermilion }} />
+                All Facilities
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 max-w-lg pt-2">
+              {[
+                { n: '6', l: 'Disciplines', c: LOGO.green },
+                { n: '20', l: 'Pro Courts', c: LOGO.orange },
+                { n: '1,200+', l: 'Members', c: LOGO.blue },
+              ].map((st) => (
+                <div
+                  key={st.l}
+                  className="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 shadow-sm p-3"
+                  style={{ borderTop: `4px solid ${st.c}` }}
                 >
-                  <SportIcon sportId={sport.id} className="w-4 h-4 shrink-0" size={16} />
-                  <span>{sport.name}</span>
-                </button>
+                  <div className="font-display text-3xl font-black leading-none">{st.n}</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-black/55 dark:text-white/65 mt-1">{st.l}</div>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Active Sport Spotlight Card */}
-          <div
-            className={`border rounded-xs p-6 sm:p-8 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${
-              isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-slate-50 border-slate-200'
-            }`}
-          >
-            <div className="lg:col-span-6 relative rounded-xs overflow-hidden h-72 sm:h-96 border border-neutral-800/40">
-              <img
-                src={currentSport.image}
-                alt={currentSport.name}
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute top-4 left-4 px-3 py-1 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider rounded-xs font-mono">
-                {currentSport.badge}
-              </div>
-              <div className="absolute bottom-4 left-4 right-4 p-3 bg-black/80 backdrop-blur-xs text-white text-xs rounded-xs flex items-center justify-between font-mono-numbers">
-                <span>{currentSport.courts}</span>
-                <span className="text-emerald-400 font-bold">{currentSport.openSlots}</span>
-              </div>
+          <div className="lg:col-span-6 space-y-3">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+              {MULTI_SPORTS_LIST.map((sport) => {
+                const c = getSportColor(sport.id, isDarkMode);
+                const on = sport.id === activeSportId;
+                return (
+                  <button
+                    key={sport.id}
+                    onClick={() => setActiveSportId(sport.id)}
+                    className="flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-md text-[11px] font-extrabold uppercase tracking-wide border-2 transition-all cursor-pointer"
+                    style={
+                      on
+                        ? { backgroundColor: c, borderColor: c, color: '#fff' }
+                        : isDarkMode
+                        ? { backgroundColor: '#171717', borderColor: `${c}66`, color: '#f5f5f5' }
+                        : { backgroundColor: '#fff', borderColor: `${c}55`, color: '#0B0B0B' }
+                    }
+                  >
+                    <SportIcon sportId={sport.id} className="w-3.5 h-3.5" size={14} />
+                    <span>{sport.id === 'hyrox' ? 'Hyrox' : sport.name}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="lg:col-span-6 space-y-5">
-              <div>
-                <span className="text-red-500 text-xs font-mono font-bold uppercase tracking-widest block">
-                  TIARA SPORTS CLUB · VADODARA CAMPUS
+            <div
+              className="relative rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-neutral-900"
+              style={{ border: `4px solid ${activeColor}` }}
+            >
+              <div className="relative h-[360px] sm:h-[430px]">
+                <img src={activeSport.image} alt={activeSport.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <span
+                  className="absolute top-4 left-4 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest text-white"
+                  style={{ backgroundColor: activeColor }}
+                >
+                  {activeSport.badge}
                 </span>
-                <h3 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-tight mt-1">
-                  {currentSport.name}
-                </h3>
               </div>
-
-              <p
-                className={`text-sm leading-relaxed ${
-                  isDarkMode ? 'text-neutral-300' : 'text-slate-700'
-                }`}
-              >
-                {currentSport.desc}
-              </p>
-
-              {/* Amenities */}
-              <div className="space-y-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-red-500 font-mono block">
-                  FACILITY FEATURES:
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {currentSport.amenities.map((item) => (
-                    <div
-                      key={item}
-                      className={`flex items-center gap-2 text-xs ${
-                        isDarkMode ? 'text-neutral-300' : 'text-slate-700'
-                      }`}
+              <div className="p-4 sm:p-5 bg-white dark:bg-neutral-900 flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white shrink-0"
+                      style={{ backgroundColor: activeColor }}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-red-500 shrink-0" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
+                      <SportIcon sportId={activeSport.id} className="w-4 h-4" size={16} />
+                    </span>
+                    <h3 className="font-display text-2xl font-black uppercase truncate">{activeSport.name}</h3>
+                  </div>
+                  <p className="text-xs text-black/60 dark:text-white/70 mt-1 truncate">{activeSport.courts}</p>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button
-                  onClick={() => onOpenBooking(currentSport.id)}
-                  className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider rounded-xs transition-colors cursor-pointer flex items-center gap-2"
+                  onClick={() => onOpenBooking(activeSport.facilityId)}
+                  className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-extrabold uppercase tracking-wider text-white cursor-pointer"
+                  style={{ backgroundColor: activeColor }}
                 >
-                  <Calendar className="w-4 h-4" />
-                  <span>Reserve Slot Now</span>
-                </button>
-                <button
-                  onClick={() => onNavigate('facilities')}
-                  className={`px-5 py-3 text-xs font-bold uppercase tracking-wider rounded-xs border transition-colors cursor-pointer ${
-                    isDarkMode
-                      ? 'border-neutral-700 text-neutral-300 hover:text-white hover:bg-neutral-800'
-                      : 'border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-200'
-                  }`}
-                >
-                  View All Court Specs
+                  Reserve <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
           </div>
+        </div>
+        <BrandBar className="h-2" />
+      </section>
 
-          {/* Interactive Turf Slot Timetable & Live Availability Checker */}
-          <div className="pt-4">
+      {/* 2. DISCIPLINES + INQUIRY */}
+      <section className="py-16 sm:py-20 bg-[#F7F8FA] dark:bg-neutral-950 border-b border-black/10 dark:border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest" style={{ color: LOGO.green }}>
+              Every discipline · World-class standards
+            </span>
+            <h2 className="font-display text-4xl sm:text-5xl font-black uppercase tracking-tight mt-1">
+              Six ways to play at Tiara
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {MULTI_SPORTS_LIST.map((sport) => {
+              const c = getSportColor(sport.id, isDarkMode);
+              return (
+                <article
+                  key={sport.id}
+                  className="group bg-white dark:bg-neutral-900 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col"
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img src={sport.image} alt={sport.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
+                    <span
+                      className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider text-white"
+                      style={{ backgroundColor: c }}
+                    >
+                      {sport.badge}
+                    </span>
+                  </div>
+                  <div className="h-1.5" style={{ backgroundColor: c }} />
+                  <div className="p-5 space-y-3 flex flex-col flex-1">
+                    <div className="flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0" style={{ backgroundColor: c }}>
+                        <SportIcon sportId={sport.id} className="w-5 h-5" size={20} />
+                      </span>
+                      <h3 className="font-display text-2xl font-black uppercase leading-none">{sport.name}</h3>
+                    </div>
+                    <p className="text-sm text-black/65 dark:text-white/75 leading-relaxed">{sport.desc}</p>
+                    <ul className="space-y-1.5">
+                      {sport.amenities.map((a) => (
+                        <li key={a} className="flex items-center gap-2 text-xs text-black/80 dark:text-white/80">
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: c }} />
+                          {a}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="pt-2 mt-auto flex items-center gap-2">
+                      <button
+                        onClick={() => onOpenBooking(sport.facilityId)}
+                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-xs font-extrabold uppercase tracking-wider text-white cursor-pointer"
+                        style={{ backgroundColor: c }}
+                      >
+                        <Calendar className="w-3.5 h-3.5" /> Reserve
+                      </button>
+                      <button
+                        onClick={() => onNavigate('facilities')}
+                        className="px-4 py-2.5 rounded-md text-xs font-extrabold uppercase tracking-wider border-2 border-[#0B0B0B]/15 dark:border-white/20 hover:border-[#0B0B0B] dark:hover:border-white transition-colors cursor-pointer"
+                      >
+                        Specs
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="pt-2">
             <TurfSlotBookingWidget onOpenBooking={onOpenBooking} isDarkMode={isDarkMode} />
           </div>
         </div>
@@ -918,6 +750,98 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
+      {/* 5B. GROWTH SECTION */}
+      <section className="py-16 sm:py-20 bg-[#F7F8FA] dark:bg-neutral-950 border-b border-black/10 dark:border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest" style={{ color: LOGO.orange }}>
+              Built for growth · Vadodara, Gujarat
+            </span>
+            <h2 className="font-display text-4xl sm:text-5xl font-black uppercase tracking-tight mt-1">
+              Growing with every athlete
+            </h2>
+            <p className="text-xs sm:text-sm mt-2 text-black/60 dark:text-white/70">
+              World-class courts, expert coaching, a Hyrox training floor, and night-ready lighting, everything an athlete needs to grow.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {GROWTH_CARDS.map((card, i) => {
+              const Icon =
+                card.icon === 'trophy' ? Trophy : card.icon === 'users' ? Users : card.icon === 'dumbbell' ? Dumbbell : Clock;
+              const c = GROWTH_COLORS[i % GROWTH_COLORS.length];
+              return (
+                <div
+                  key={card.id}
+                  className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all"
+                  style={{ borderTop: `5px solid ${c}` }}
+                >
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white mb-5 shadow-md" style={{ backgroundColor: c }}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-display text-xl font-black uppercase tracking-wide">{card.title}</h3>
+                  <p className="text-sm text-black/65 dark:text-white/75 leading-relaxed mt-2">{card.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 5C. CERTIFIED COACHES */}
+      <section className="py-16 sm:py-20 bg-white dark:bg-neutral-900 border-b border-black/10 dark:border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest" style={{ color: LOGO.blue }}>
+              Train with the best · Tiara Academy
+            </span>
+            <h2 className="font-display text-4xl sm:text-5xl font-black uppercase tracking-tight mt-1">
+              Our certified coaches
+            </h2>
+            <p className="text-xs sm:text-sm mt-2 text-black/60 dark:text-white/70">
+              Qualified, experienced coaches guiding every discipline at Tiara Sports Club.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {CERTIFIED_COACHES.map((coach) => {
+              const c = getSportColor(coach.sportId, isDarkMode);
+              return (
+                <article
+                  key={coach.id}
+                  className="bg-white dark:bg-neutral-900 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-sm hover:shadow-xl transition-all flex flex-col"
+                >
+                  <div className="relative aspect-[4/5] bg-[#EEF0F3] dark:bg-neutral-800">
+                    <img src={isDarkMode && coach.image.includes('coach_placeholder') ? COACH_DARK : coach.image} alt={`${coach.role} at Tiara Sports Club`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <span
+                      className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider text-white flex items-center gap-1.5"
+                      style={{ backgroundColor: c }}
+                    >
+                      <SportIcon sportId={coach.sportId} className="w-3 h-3" size={12} />
+                      {coach.certification}
+                    </span>
+                  </div>
+                  <div className="h-1.5" style={{ backgroundColor: c }} />
+                  <div className="p-5 space-y-3 flex flex-col flex-1">
+                    <div>
+                      <h3 className="font-display text-xl font-black uppercase">{coach.role}</h3>
+                      <span className="text-[11px] font-mono text-black/50 dark:text-white/65">{coach.experience}</span>
+                    </div>
+                    <p className="text-sm text-black/65 dark:text-white/75 leading-relaxed">{coach.description}</p>
+                    <ul className="space-y-1.5 mt-auto pt-1">
+                      {coach.specialities.map((item) => (
+                        <li key={item} className="flex items-center gap-2 text-xs text-black/80 dark:text-white/80">
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: c }} />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* 6. LATEST FROM TIARA SPORTS BLOG */}
       <section
         className={`py-16 sm:py-20 border-b ${
@@ -1025,47 +949,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </section>
 
       {/* 7. CALL TO ACTION: MEMBERSHIP & RESERVATION */}
-      <section
-        className={`py-20 text-center relative overflow-hidden ${
-          isDarkMode
-            ? 'bg-gradient-to-b from-neutral-950 to-neutral-900'
-            : 'bg-gradient-to-b from-slate-100 to-white'
-        }`}
-      >
-        <div className="max-w-4xl mx-auto px-4 space-y-6 relative z-10">
-          <span className="text-red-600 font-bold uppercase tracking-widest text-xs block font-mono">
-            JOIN VADODARA'S PREMIER MULTI-SPORT COMMUNITY
-          </span>
-          <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-none">
-            BECOME A MEMBER OF TIARA SPORTS CLUB
+      <section className="text-white text-center" style={{ backgroundColor: LOGO.navy }}>
+        <div className="max-w-5xl mx-auto px-4 py-16 space-y-5">
+          <img src={TIARA_LOGO} alt="" aria-hidden="true" className="h-20 w-20 mx-auto" />
+          <h2 className="font-display text-4xl sm:text-6xl font-black uppercase leading-none">
+            Become a member of Tiara Sports Club
           </h2>
-          <p
-            className={`text-sm max-w-xl mx-auto leading-relaxed ${
-              isDarkMode ? 'text-neutral-400' : 'text-slate-600'
-            }`}
-          >
-            Access our championship tennis arena, pro pickleball arena, BWF badminton hall,
-            and high-performance gym. Flexible annual family memberships and pay-and-play sessions available.
+          <p className="text-sm text-white/75 max-w-xl mx-auto leading-relaxed">
+            Access our championship tennis arena, pro pickleball arena, BWF badminton hall, Hyrox fitness box,
+            gymnastics arena, and cafe. Flexible annual family memberships and pay-and-play sessions available.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
             <button
               onClick={() => onOpenBooking()}
-              className="px-8 py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-widest rounded-xs transition-colors shadow-xl shadow-red-600/30 cursor-pointer"
+              className="px-7 py-3.5 rounded-md text-xs font-extrabold uppercase tracking-widest text-white cursor-pointer"
+              style={{ backgroundColor: LOGO.vermilion }}
             >
-              INQUIRE COURT OR GYM SLOT
+              Inquire slot or batch
             </button>
             <button
               onClick={() => onNavigate('contact')}
-              className={`px-8 py-3.5 font-bold text-xs uppercase tracking-widest rounded-xs border transition-colors cursor-pointer ${
-                isDarkMode
-                  ? 'bg-neutral-900 hover:bg-neutral-800 text-white border-neutral-700'
-                  : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
-              }`}
+              className="px-7 py-3.5 rounded-md text-xs font-extrabold uppercase tracking-widest bg-white text-[#0B0B0B] hover:bg-white/90 cursor-pointer"
             >
-              MEMBERSHIP DESK (VADODARA)
+              Membership desk (Vadodara)
             </button>
           </div>
         </div>
+        <BrandBar className="h-2" />
       </section>
     </div>
   );

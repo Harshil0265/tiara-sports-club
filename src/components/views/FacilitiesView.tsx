@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { NavRoute } from '../../types';
 import { 
   GYM_IMAGE,
+  GYMNASTICS_IMAGE,
+  CAFE_IMAGE,
   PICKLEBALL_IMAGE,
   BADMINTON_GYM_IMAGE,
   TENNIS_COURT_IMAGE,
@@ -147,33 +149,91 @@ export const FacilitiesView: React.FC<FacilitiesViewProps> = ({
       coachingProgram: 'Former national medalists directing daily beginner, intermediate, and elite squads.'
     },
     {
-      id: 'fitness-gym',
-      sportId: 'gym',
-      sportName: 'Gym',
-      facilityTitle: 'Tiara Gym & Strength Suite',
-      categoryBadge: 'ATHLETE CONDITIONING',
+      id: 'hyrox-fitness-box',
+      sportId: 'hyrox',
+      sportName: 'Hyrox Fitness Box',
+      facilityTitle: 'Tiara Hyrox Fitness Box',
+      categoryBadge: 'HYROX RACE TRAINING',
       statusBadge: 'Open 06:00 - 23:00',
-      headlineSubtitle: 'High-Performance Strength, Cardio & Recovery Facility · Vadodara',
-      description: 'A sports-performance gym built for genuine athletes and fitness enthusiasts. Features Swedish Eleiko barbell lifting platforms, Technogym Skill Line cardio, Hammer Strength iso-lateral stations, and a dedicated 30-meter sprint turf track with radar timing gates.',
+      headlineSubtitle: 'Hyrox Race Simulation, Strength & Running Conditioning · Vadodara',
+      description: 'A purpose-built Hyrox training box for racers and fitness enthusiasts. Train the full Hyrox format of eight 1 km runs and eight functional stations on sled push and pull lanes, SkiErgs, rowers, wall ball targets, farmers carry handles, and sandbag lunge lanes.',
       image: GYM_IMAGE,
-      courtCount: 'Full-Service Strength Floor & Recovery Suite',
+      courtCount: 'Hyrox Race-Simulation Floor & Running Loop',
       pricing: 'Included with Club Membership / ₹350 Day Pass',
       singlePrice: { label: 'Single (Day Pass)', amount: '₹350/day' },
       multiplePrice: { label: 'Multiple (Member)', amount: 'Full Access' },
-      surfaceType: 'Heavy Impact Rubber Flooring & 30m Prowler Sprint Turf',
+      surfaceType: 'Heavy Impact Rubber Flooring & Sled Turf Lanes',
       lightingSpec: 'Modern Architectural LED Daylight Balancing',
       amenities: [
-        'Eleiko IPF Certified weightlifting bars and bumper plates',
-        'Technogym Skillmill, Skillrun & Skillbike metabolic conditioning',
-        'InBody 770 multi-frequency body composition analyzer',
-        'Contrast recovery suite with ice bath plunges & Finnish sauna'
+        'Sled push and pull lanes with progressive loading',
+        'SkiErg and Concept2 rowing stations for race pacing',
+        'Wall ball, sandbag lunge, and farmers carry stations',
+        'Group Hyrox classes and full race-simulation heats'
       ],
       specs: [
-        { label: 'Conditioning', value: 'Full-Service Air Conditioned Suite' },
-        { label: 'Lifting Platforms', value: 'Dedicated Barbell Drop Zones' },
-        { label: 'Trainers', value: 'CSCS & ACSM Certified Coaches' }
+        { label: 'Format', value: '8 x 1 km Run + 8 Stations' },
+        { label: 'Capacity', value: '60 Athletes' },
+        { label: 'Coaches', value: 'Certified Hyrox Coaches' }
       ],
-      coachingProgram: 'Individualized athlete periodization programs for racquet sports, functional fitness, and endurance.'
+      coachingProgram: 'Structured Hyrox programs for first-timers, doubles teams, and competitive racers, plus personal training.'
+    },
+    {
+      id: 'gymnastics-arena',
+      sportId: 'gymnastics',
+      sportName: 'Gymnastics',
+      facilityTitle: 'Tiara Gymnastics Arena',
+      categoryBadge: 'SPRUNG FLOOR & FOAM PIT',
+      statusBadge: 'Batches Open',
+      headlineSubtitle: 'Artistic Gymnastics, Tumbling & Flexibility · Vadodara',
+      description: 'A dedicated gymnastics arena with a sprung competition floor, balance beams, uneven and parallel bars, vault runway, rings, tumble track, and a foam landing pit, built for safe skill progression from first cartwheel to competitive routines.',
+      image: GYMNASTICS_IMAGE,
+      courtCount: 'Dedicated Gymnastics Arena',
+      pricing: 'From ₹400/session',
+      singlePrice: { label: 'Single (Kids)', amount: '₹400/session' },
+      multiplePrice: { label: 'Multiple (Adult)', amount: '₹500/session' },
+      surfaceType: 'Sprung Competition Floor with Foam Pit Landing',
+      lightingSpec: 'Bright Shadow-Free LED Arena Lighting',
+      amenities: [
+        'Sprung floor, balance beams, bars, vault, and rings',
+        'Foam pit and tumble track for safe skill learning',
+        'Separate kids, junior, and adult beginner batches',
+        'Flexibility and body-conditioning zone'
+      ],
+      specs: [
+        { label: 'Equipment', value: 'Floor, Beam, Bars, Vault & Rings' },
+        { label: 'Capacity', value: '40 Gymnasts' },
+        { label: 'Coaches', value: 'Certified Gymnastics Coaches' }
+      ],
+      coachingProgram: 'Progressive batches for kids, juniors, and adults covering flexibility, strength, balance, and routines.'
+    },
+    {
+      id: 'cafe-lounge',
+      sportId: 'cafe',
+      sportName: 'Cafe',
+      facilityTitle: 'Tiara Cafe & Lounge',
+      categoryBadge: 'CLUBHOUSE CAFE',
+      statusBadge: 'Open 06:00 - 23:00',
+      headlineSubtitle: 'Post-Game Recovery, Refreshments & Member Lounge · Vadodara',
+      description: 'The clubhouse cafe is the place to refuel after a match or workout. Enjoy protein shakes, fresh juices, coffee, healthy meals, and snacks in a relaxed lounge with views over the courts.',
+      image: CAFE_IMAGE,
+      courtCount: 'Court-View Lounge & Outdoor Deck',
+      pricing: 'Table reservations are free',
+      singlePrice: { label: 'Single (Table)', amount: 'Free' },
+      multiplePrice: { label: 'Multiple (Group)', amount: 'On Request' },
+      surfaceType: 'Indoor Lounge & Outdoor Deck Seating',
+      lightingSpec: 'Warm Ambient Lounge Lighting',
+      amenities: [
+        'Protein shakes, fresh juices, and smoothies',
+        'Healthy meals, light snacks, and coffee',
+        'Court-view indoor lounge and outdoor deck',
+        'Group tables for teams, academy parents, and events'
+      ],
+      specs: [
+        { label: 'Timings', value: '06:00 AM – 11:00 PM' },
+        { label: 'Seating', value: '60 Guests' },
+        { label: 'Menu', value: 'Healthy & Athlete-Friendly' }
+      ],
+      coachingProgram: 'Team meals, birthday tables, and post-tournament get-togethers can be arranged with the cafe desk.'
     }
   ];
 
@@ -182,11 +242,13 @@ export const FacilitiesView: React.FC<FacilitiesViewProps> = ({
     : combinedSportsFacilities.filter((item) => item.sportId === selectedCategoryFilter);
 
   const filterTabs = [
-    { id: 'all', label: 'All Sports & Facilities (4)' },
+    { id: 'all', label: 'All Sports & Facilities (6)' },
     { id: 'tennis', label: 'Tennis' },
     { id: 'pickleball', label: 'Pickleball Arena' },
     { id: 'badminton', label: 'Badminton Hall' },
-    { id: 'gym', label: 'Gym' },
+    { id: 'hyrox', label: 'Hyrox Fitness Box' },
+    { id: 'gymnastics', label: 'Gymnastics' },
+    { id: 'cafe', label: 'Cafe' },
   ];
 
   return (
@@ -215,7 +277,7 @@ export const FacilitiesView: React.FC<FacilitiesViewProps> = ({
             >
               Every sport discipline at Tiara Sports Club is backed by international-specification 
               infrastructure: Championship tennis arena, dedicated pickleball facility, 
-              BWF teak badminton complex, and high-performance gym in Vadodara, Gujarat.
+              BWF teak badminton complex, Hyrox fitness box, gymnastics arena, and clubhouse cafe in Vadodara, Gujarat.
             </p>
           </div>
 
@@ -271,12 +333,12 @@ export const FacilitiesView: React.FC<FacilitiesViewProps> = ({
           </div>
         </div>
 
-        {/* 3. Live Court & Gym Availability Widget */}
+        {/* 3. Live Sports & Fitness Availability Widget */}
         <div className="pt-2">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-mono font-bold tracking-widest text-red-600 uppercase flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5" />
-              <span>LIVE COURT & GYM SLOT INQUIRY BOARD (VADODARA CAMPUS)</span>
+              <span>LIVE SPORTS & FITNESS SLOT INQUIRY BOARD (VADODARA CAMPUS)</span>
             </span>
             <span className={`text-xs ${isDarkMode ? 'text-neutral-400' : 'text-slate-500'}`}>
               Instant Email Notification to Admin
@@ -608,7 +670,7 @@ export const FacilitiesView: React.FC<FacilitiesViewProps> = ({
             <h4 className="font-display text-lg font-bold uppercase">Footwear & Gear Protocol</h4>
             <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-neutral-400' : 'text-slate-600'}`}>
               Non-marking shoes are strictly mandatory on badminton teak courts and Plexipave tennis courts.
-              Clean training shoes required for the gym facility.
+              Clean training shoes are required in the Hyrox box and gymnastics arena.
             </p>
           </div>
 

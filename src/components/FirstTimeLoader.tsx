@@ -15,8 +15,11 @@ export const FirstTimeLoader: React.FC<FirstTimeLoaderProps> = ({ onComplete }) 
     { id: 'tennis', name: 'Tennis', spec: 'ITF Level 3' },
     { id: 'pickleball', name: 'Pickleball', spec: 'USAPA Pro' },
     { id: 'badminton', name: 'Badminton', spec: 'BWF Teak' },
-    { id: 'gym', name: 'Gym', spec: 'S&C Elite' },
+    { id: 'hyrox', name: 'Hyrox', spec: 'Fitness Box' },
+    { id: 'gymnastics', name: 'Gymnastics', spec: 'Spring Floor' },
+    { id: 'cafe', name: 'Cafe', spec: 'Club Lounge' },
   ];
+  const stageSize = 100 / sportsList.length;
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
@@ -47,54 +50,59 @@ export const FirstTimeLoader: React.FC<FirstTimeLoaderProps> = ({ onComplete }) 
 
   // Determine current active sport based on progress quadrant
   const getActiveStage = () => {
-    if (progress < 25) return 'Calibrating Tennis Courts';
-    if (progress < 50) return 'Configuring Pickleball Center';
-    if (progress < 75) return 'Setting Up Badminton Arena';
-    if (progress < 100) return 'Preparing Strength & Conditioning Gym';
-    return 'Vadodara Campus Ready';
+    if (progress >= 100) return 'Vadodara Campus Ready';
+    const stages = [
+      'Calibrating Tennis Courts',
+      'Configuring Pickleball Center',
+      'Setting Up Badminton Arena',
+      'Preparing Hyrox Fitness Box',
+      'Setting Up Gymnastics Arena',
+      'Brewing Fresh Coffee at Tiara Cafe',
+    ];
+    return stages[Math.min(Math.floor(progress / stageSize), stages.length - 1)];
   };
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-neutral-950 text-white select-none transition-opacity duration-500 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-neutral-950 text-[#0B0B0B] dark:text-white select-none transition-opacity duration-500 ${
         isFadingOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
       {/* Subtle architectural radial glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-950/30 via-neutral-950 to-neutral-950 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-100/70 via-white to-white dark:from-red-950/30 dark:via-neutral-950 dark:to-neutral-950 pointer-events-none" />
 
       {/* Main Centered Content Box with Generous Width & Spacing */}
       <div className="relative z-10 flex flex-col items-center w-full max-w-xl px-4 sm:px-6 text-center space-y-7">
         
         {/* Tiara Brand Emblem & Typography */}
         <div className="transform scale-105 sm:scale-110 mb-1">
-          <TiaraBrandLogo isLightMode={false} size="lg" />
+          <TiaraBrandLogo isLightMode={!document.documentElement.classList.contains('dark')} size="lg" />
         </div>
 
         {/* Structured 4-Sport Arena Status Bar (Spacious Cards, No Jitter, Zero Layout Shifts) */}
         <div className="w-full space-y-3 mt-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4">
             {sportsList.map((sport, idx) => {
-              const threshold = (idx + 1) * 25;
-              const isCompleted = progress >= threshold;
-              const isActive = progress >= idx * 25 && progress < threshold;
+              const threshold = (idx + 1) * stageSize;
+              const isCompleted = progress >= threshold - 0.001;
+              const isActive = progress >= idx * stageSize && progress < threshold - 0.001;
 
               return (
                 <div
                   key={sport.id}
-                  className={`p-3.5 sm:p-4 rounded-xs border flex flex-col items-center justify-center space-y-2 sm:space-y-2.5 transition-all duration-300 min-h-[118px] sm:min-h-[126px] ${
+                  className={`p-3.5 sm:p-4 rounded-xs border flex flex-col items-center justify-center space-y-2 sm:space-y-2.5 transition-all duration-300 min-h-[108px] sm:min-h-[116px] ${
                     isCompleted
-                      ? 'bg-neutral-900 border-red-600/80 shadow-md shadow-red-950/20'
+                      ? 'bg-white dark:bg-neutral-900 border-red-600 shadow-md'
                       : isActive
-                      ? 'bg-neutral-900/90 border-red-500 shadow-md ring-1 ring-red-500/30'
-                      : 'bg-neutral-950/80 border-neutral-800/80 opacity-40'
+                      ? 'bg-white dark:bg-neutral-900/90 border-red-500 shadow-md ring-1 ring-red-500/30'
+                      : 'bg-slate-50 dark:bg-neutral-950/80 border-slate-200 dark:border-neutral-800/80 opacity-50'
                   }`}
                 >
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                       isCompleted || isActive
-                        ? 'bg-red-600/15 text-red-500'
-                        : 'bg-neutral-900 text-neutral-600'
+                        ? 'bg-red-600/15 text-red-600'
+                        : 'bg-slate-100 dark:bg-neutral-900 text-slate-400 dark:text-neutral-600'
                     }`}
                   >
                     <SportIcon sportId={sport.id} className="w-4.5 h-4.5 text-red-500" size={18} />
@@ -102,13 +110,13 @@ export const FirstTimeLoader: React.FC<FirstTimeLoaderProps> = ({ onComplete }) 
 
                   <span
                     className={`font-display text-xs font-bold uppercase tracking-wider block transition-colors ${
-                      isCompleted || isActive ? 'text-white' : 'text-neutral-500'
+                      isCompleted || isActive ? 'text-[#0B0B0B] dark:text-white' : 'text-slate-400 dark:text-neutral-500'
                     }`}
                   >
                     {sport.name}
                   </span>
 
-                  <span className="font-mono text-[9px] text-neutral-400 block tracking-wide">
+                  <span className="font-mono text-[9px] text-slate-500 dark:text-neutral-400 block tracking-wide">
                     {sport.spec}
                   </span>
 
@@ -124,7 +132,7 @@ export const FirstTimeLoader: React.FC<FirstTimeLoaderProps> = ({ onComplete }) 
 
           {/* Current Stage Status (Anchored 1-Line Height) */}
           <div className="h-6 flex items-center justify-center pt-1">
-            <span className="text-xs font-mono font-medium text-red-400 uppercase tracking-widest">
+            <span className="text-xs font-mono font-medium text-red-600 uppercase tracking-widest">
               {getActiveStage()}
             </span>
           </div>
@@ -132,11 +140,11 @@ export const FirstTimeLoader: React.FC<FirstTimeLoaderProps> = ({ onComplete }) 
 
         {/* Clean Progress Bar & Percentage */}
         <div className="w-full space-y-2.5">
-          <div className="flex justify-between items-center text-xs font-mono text-neutral-400 px-0.5">
+          <div className="flex justify-between items-center text-xs font-mono text-slate-500 dark:text-neutral-400 px-0.5">
             <span className="tracking-wider">INITIALIZING CAMPUS</span>
-            <span className="text-white font-bold">{progress}%</span>
+            <span className="text-[#0B0B0B] dark:text-white font-bold">{progress}%</span>
           </div>
-          <div className="h-2 w-full bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
+          <div className="h-2 w-full bg-slate-100 dark:bg-neutral-900 rounded-full overflow-hidden border border-slate-200 dark:border-neutral-800">
             <div
               className="h-full bg-red-600 transition-all duration-75 ease-out rounded-full shadow-sm shadow-red-600"
               style={{ width: `${progress}%` }}
@@ -156,7 +164,7 @@ export const FirstTimeLoader: React.FC<FirstTimeLoaderProps> = ({ onComplete }) 
         </div>
 
         {/* Location Tag */}
-        <div className="text-[10px] uppercase font-mono tracking-widest text-neutral-500 flex items-center justify-center gap-2 pt-0.5">
+        <div className="text-[10px] uppercase font-mono tracking-widest text-slate-500 dark:text-neutral-500 flex items-center justify-center gap-2 pt-0.5">
           <span>SAMA-SAVLI ROAD</span>
           <span>·</span>
           <span className="text-red-500 font-bold">VADODARA, GUJARAT</span>

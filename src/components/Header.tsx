@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavRoute } from '../types';
-import { LIVE_TICKER_ITEMS, MULTI_SPORTS_LIST } from '../data/clubData';
+import { MULTI_SPORTS_LIST } from '../data/clubData';
+// import { LIVE_TICKER_ITEMS } from '../data/clubData'; // used by the commented-out LIVE ribbon
 import { TiaraBrandLogo } from './TiaraBrandLogo';
 import { SportIcon } from './SportsThemeIcon';
+import { BrandBar } from './BrandBar';
+import { getSportColor } from '../theme/logoTheme';
 import { 
   Menu, 
   X, 
@@ -33,16 +36,17 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sportsDropdownOpen, setSportsDropdownOpen] = useState(false);
-  const [tickerIndex, setTickerIndex] = useState(0);
+  // LIVE ribbon ticker state (disabled together with the ribbon below)
+  // const [tickerIndex, setTickerIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Auto-cycle ticker
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % LIVE_TICKER_ITEMS.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
+  // Auto-cycle ticker (disabled together with the LIVE ribbon below)
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setTickerIndex((prev) => (prev + 1) % LIVE_TICKER_ITEMS.length);
+  //   }, 4500);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -75,10 +79,12 @@ export const Header: React.FC<HeaderProps> = ({
       className={`sticky top-0 z-40 w-full transition-all duration-200 border-b ${
         isDarkMode
           ? 'bg-neutral-950/90 border-neutral-800/80 text-white backdrop-blur-xl'
-          : 'bg-white/90 border-slate-200/90 text-slate-900 backdrop-blur-xl shadow-xs'
+          : 'bg-white/95 border-black/10 text-slate-900 backdrop-blur-xl shadow-xs'
       }`}
     >
-      {/* 1. Sleek Modern Sports Ribbon (Micro-Strip) */}
+      <BrandBar className="h-1" />
+
+      {/* 1. LIVE news ribbon (commented out per request; restore by uncommenting this block)
       <div
         className={`px-3 sm:px-6 py-1 text-[11px] border-b transition-colors ${
           isDarkMode
@@ -87,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
         }`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-          {/* Live Marquee Item */}
+          [Live Marquee Item]
           <div className="flex items-center gap-2 overflow-hidden">
             <span className="flex items-center gap-1 px-1.5 py-0.5 bg-red-600 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-xs shrink-0 shadow-xs">
               <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
@@ -97,8 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
               {LIVE_TICKER_ITEMS[tickerIndex]}
             </span>
           </div>
-
-          {/* Quick Info Badges */}
+          [Quick Info Badges]
           <div
             className={`hidden md:flex items-center gap-3 text-[11px] shrink-0 font-medium ${
               isDarkMode ? 'text-neutral-400' : 'text-slate-500'
@@ -117,9 +122,10 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       </div>
+      */}
 
       {/* 2. Main Navigation Bar (Clean, Balanced, Modern) */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-15 sm:h-16 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between gap-3">
         {/* Left: Typography Logo */}
         <button
           onClick={() => handleNavClick('home')}
@@ -145,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onMouseEnter={() => setSportsDropdownOpen(true)}
                     className={`px-2.5 xl:px-3 py-1.5 rounded-sm transition-all flex items-center gap-1 cursor-pointer ${
                       isActive || sportsDropdownOpen
-                        ? 'text-red-600 bg-red-600/10 font-extrabold'
+                        ? 'text-white bg-[#003147] dark:bg-[#1C75BC] font-extrabold'
                         : isDarkMode
                         ? 'text-neutral-300 hover:text-white hover:bg-neutral-800/60'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -170,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
                           VADODARA SPORTS DISCIPLINES
                         </span>
                         <span className={`text-[10px] ${isDarkMode ? 'text-neutral-400' : 'text-slate-500'}`}>
-                          4 Disciplines & Arenas
+                          6 Disciplines & Venues
                         </span>
                       </div>
 
@@ -188,7 +194,10 @@ export const Header: React.FC<HeaderProps> = ({
                                 : 'bg-slate-50 border-slate-200 hover:border-red-500 hover:bg-slate-100'
                             }`}
                           >
-                            <div className="p-1.5 rounded-xs bg-red-600/10 text-red-600 shrink-0 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                            <div
+                              className="p-1.5 rounded-full text-white shrink-0"
+                              style={{ backgroundColor: getSportColor(sport.id, isDarkMode) }}
+                            >
                               <SportIcon sportId={sport.id} className="w-4.5 h-4.5" size={18} />
                             </div>
                             <div className="overflow-hidden">
@@ -236,7 +245,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => handleNavClick(item.route)}
                 className={`px-2.5 xl:px-3 py-1.5 rounded-sm transition-all cursor-pointer ${
                   isActive
-                    ? 'text-red-600 bg-red-600/10 font-extrabold shadow-2xs'
+                    ? 'text-white bg-[#003147] dark:bg-[#1C75BC] font-extrabold shadow-2xs'
                     : isDarkMode
                     ? 'text-neutral-300 hover:text-white hover:bg-neutral-800/60'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -304,7 +313,7 @@ export const Header: React.FC<HeaderProps> = ({
               QUICK SPORTS ACCESS
             </span>
             <div className="grid grid-cols-3 gap-2">
-              {MULTI_SPORTS_LIST.slice(0, 6).map((sport) => (
+              {MULTI_SPORTS_LIST.map((sport) => (
                 <button
                   key={sport.id}
                   onClick={() => {
@@ -317,7 +326,7 @@ export const Header: React.FC<HeaderProps> = ({
                       : 'bg-slate-50 border-slate-200 hover:border-red-500'
                   }`}
                 >
-                  <div className="flex justify-center mb-1 text-red-600">
+                  <div className="flex justify-center mb-1" style={{ color: getSportColor(sport.id, isDarkMode) }}>
                     <SportIcon sportId={sport.id} className="w-5 h-5" size={20} />
                   </div>
                   <span className="text-[11px] font-bold block truncate">{sport.name}</span>
@@ -334,7 +343,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => handleNavClick(item.route)}
                 className={`w-full text-left px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-between cursor-pointer ${
                   currentRoute === item.route
-                    ? 'bg-red-600/15 text-red-600 font-extrabold'
+                    ? 'bg-[#003147] dark:bg-[#1C75BC] text-white font-extrabold'
                     : isDarkMode
                     ? 'text-neutral-300 hover:bg-neutral-900 hover:text-white'
                     : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'

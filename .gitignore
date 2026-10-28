@@ -7,3 +7,4 @@ DEPLOY_KEYS.txt
 *.pem
 *.key
 id_rsa*
+server.js

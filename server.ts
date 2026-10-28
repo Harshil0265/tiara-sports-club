@@ -1,7 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { createServer as createViteServer } from 'vite';
+import { existsSync } from 'fs';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
@@ -11,53 +11,92 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+  // IIS/iisnode (SmarterASP.NET) passes PORT as a named pipe string, so keep non-numeric values as-is
+  const PORT: number | string = /^\d+$/.test(process.env.PORT || '') ? Number(process.env.PORT) : process.env.PORT || 3000;
+  const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50kb' }));
 
-  // Zoho SMTP Credentials & Configuration
-  const SMTP_USER = 'web@uniqtechsolutions.com';
-  const SMTP_PASS = 'Web@281989#';
-  const SMTP_HOST = 'smtp.zoho.com';
-  const SMTP_PORT = 465;
-  const ADMIN_EMAIL = 'mikir@uniqtechsolutions.com';
+  // SMTP configuration (override any value via environment variables / .env on the host)
+  const SMTP_USER = process.env.SMTP_USER || 'web@uniqtechsolutions.com';
+  const SMTP_PASS = process.env.SMTP_PASS || 'Web@281989#';
+  const SMTP_HOST = process.env.SMTP_HOST || 'smtp.zoho.com';
+  const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tsa.sports4@gmail.com';
 
-  console.log(`[SMTP Config] Initialized Zoho SMTP for sender: ${SMTP_USER} -> Recipient: ${ADMIN_EMAIL}`);
+  console.log(`[SMTP Config] ${SMTP_HOST}:${SMTP_PORT} sender: ${SMTP_USER} -> Recipient: ${ADMIN_EMAIL}`);
 
-  // Create primary Zoho SSL Transporter (Port 465)
-  const zohoTransporterSSL = nodemailer.createTransport({
+  const baseTransport = {
     host: SMTP_HOST,
+    auth: { user: SMTP_USER, pass: SMTP_PASS },
+    tls: { rejectUnauthorized: false },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 30000,
+  };
+
+  // Primary transporter on the configured port (SSL when 465, STARTTLS otherwise)
+  const primaryTransporter = nodemailer.createTransport({
+    ...baseTransport,
     port: SMTP_PORT,
-    secure: SMTP_PORT === 465, // SSL on 465
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 10000,
+    secure: SMTP_PORT === 465,
+    requireTLS: SMTP_PORT !== 465,
   });
 
-  // Create fallback Zoho TLS Transporter (Port 587) in case 465 is blocked by firewall
-  const zohoTransporterTLS = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: 587,
-    secure: false, // TLS
-    requireTLS: true,
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 10000,
+  // Fallbacks in case the primary port is blocked by the hosting firewall
+  const fallbackTransporters = [
+    ...(SMTP_PORT !== 587
+      ? [{ label: 'STARTTLS 587', t: nodemailer.createTransport({ ...baseTransport, port: 587, secure: false, requireTLS: true }) }]
+      : []),
+    ...(SMTP_PORT !== 465
+      ? [{ label: 'SSL 465', t: nodemailer.createTransport({ ...baseTransport, port: 465, secure: true }) }]
+      : []),
+    ...(SMTP_PORT !== 2525
+      ? [{ label: 'STARTTLS 2525', t: nodemailer.createTransport({ ...baseTransport, port: 2525, secure: false, requireTLS: true }) }]
+      : []),
+  ];
+  const transporters = [{ label: `primary ${SMTP_PORT}`, t: primaryTransporter }, ...fallbackTransporters];
+
+  // Diagnostic endpoint: open /api/smtp-status on the live site to confirm SMTP works from the host
+  app.get('/api/smtp-status', async (_req, res) => {
+    const results: { transport: string; ok: boolean; error?: string }[] = [];
+    for (const { label, t } of transporters) {
+      try {
+        await t.verify();
+        results.push({ transport: label, ok: true });
+        break;
+      } catch (err: any) {
+        results.push({ transport: label, ok: false, error: err.message });
+      }
+    }
+    res.status(results.some((r) => r.ok) ? 200 : 502).json({ host: SMTP_HOST, sender: SMTP_USER, recipient: ADMIN_EMAIL, results });
   });
+
+  const escapeHtml = (value: string) =>
+    value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+
+  // Basic per-IP rate limit (5 inquiries / minute) to keep the mail endpoint from being abused
+  const hits = new Map<string, number[]>();
 
   // API endpoint for automatic background inquiry dispatch via Zoho SMTP
   app.post('/api/send-inquiry', async (req, res) => {
-    const inquiry = req.body;
+    const rawInquiry = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, any>;
+
+    const now = Date.now();
+    const recent = (hits.get(req.ip || 'unknown') || []).filter((ts) => now - ts < 60000);
+    if (recent.length >= 5) {
+      return res.status(429).json({ success: false, deliveredViaSmtp: false, error: 'Too many inquiries, please try again in a minute.' });
+    }
+    hits.set(req.ip || 'unknown', [...recent, now]);
+
+    if (!rawInquiry.name || !rawInquiry.email || !rawInquiry.phone) {
+      return res.status(400).json({ success: false, deliveredViaSmtp: false, error: 'Name, email and phone are required.' });
+    }
+
+    // HTML-escaped copy used inside the email template; rawInquiry stays for headers / plain text
+    const inquiry: Record<string, any> = Object.fromEntries(
+      Object.entries(rawInquiry).map(([k, v]) => [k, typeof v === 'string' ? escapeHtml(v.slice(0, 2000)) : v])
+    );
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -247,68 +286,60 @@ async function startServer() {
     const mailOptions = {
       from: `"Tiara Sports Club" <${SMTP_USER}>`,
       to: ADMIN_EMAIL,
-      replyTo: inquiry.email ? `"${inquiry.name || 'Customer'}" <${inquiry.email}>` : SMTP_USER,
-      subject: `[Tiara Club Inquiry] ${inquiry.facilityName || inquiry.category || 'New Inquiry'} - ${inquiry.name} (${inquiry.inquiryId || 'REF'})`,
-      text: `New Tiara Club Inquiry:\nID: ${inquiry.inquiryId}\nName: ${inquiry.name}\nEmail: ${inquiry.email}\nPhone: ${inquiry.phone}\nFacility: ${inquiry.facilityName}\nSlot: ${inquiry.date} ${inquiry.timeSlot}\nMessage: ${inquiry.query || inquiry.message}`,
+      replyTo: /^[^\s@<>",]+@[^\s@<>",]+\.[a-zA-Z]{2,}$/.test(String(rawInquiry.email)) ? String(rawInquiry.email) : SMTP_USER,
+      subject: `[Tiara Club Inquiry] ${rawInquiry.facilityName || rawInquiry.category || 'New Inquiry'} - ${rawInquiry.name} (${rawInquiry.inquiryId || 'REF'})`.replace(/[\r\n]+/g, ' ').slice(0, 200),
+      text: `New Tiara Club Inquiry:\nID: ${rawInquiry.inquiryId}\nName: ${rawInquiry.name}\nEmail: ${rawInquiry.email}\nPhone: ${rawInquiry.phone}\nFacility: ${rawInquiry.facilityName}\nSlot: ${rawInquiry.date} ${rawInquiry.timeSlot}\nMessage: ${rawInquiry.query || rawInquiry.message}`,
       html: htmlContent,
     };
 
-    console.log(`[Zoho SMTP] Attempting to dispatch email for inquiry ${inquiry.inquiryId} to ${ADMIN_EMAIL}...`);
+    console.log(`[SMTP] Attempting to dispatch inquiry ${rawInquiry.inquiryId} to ${ADMIN_EMAIL}...`);
 
-    let sentSuccessfully = false;
-    let messageId = null;
+    let messageId: string | null = null;
     let lastError: any = null;
 
-    // Try SSL on Port 465 first
-    try {
-      const info = await zohoTransporterSSL.sendMail(mailOptions);
-      sentSuccessfully = true;
-      messageId = info.messageId;
-      console.log(`[Zoho SMTP SSL (465) SUCCESS] Dispatched to ${ADMIN_EMAIL}. MessageId: ${messageId}`);
-    } catch (sslErr: any) {
-      console.warn(`[Zoho SMTP SSL (465) Warning] Failed: ${sslErr.message}. Trying TLS (587)...`);
-      lastError = sslErr;
-
-      // Try TLS on Port 587
+    for (const { label, t } of transporters) {
       try {
-        const infoTLS = await zohoTransporterTLS.sendMail(mailOptions);
-        sentSuccessfully = true;
-        messageId = infoTLS.messageId;
-        console.log(`[Zoho SMTP TLS (587) SUCCESS] Dispatched to ${ADMIN_EMAIL}. MessageId: ${messageId}`);
-      } catch (tlsErr: any) {
-        console.error(`[Zoho SMTP TLS (587) Error] Failed: ${tlsErr.message}`);
-        lastError = tlsErr;
+        const info = await t.sendMail(mailOptions);
+        messageId = info.messageId;
+        console.log(`[SMTP ${label} SUCCESS] Delivered to ${ADMIN_EMAIL}. MessageId: ${messageId}`);
+        break;
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[SMTP ${label} FAILED] ${err.message}`);
       }
     }
 
-    res.json({
-      success: true,
-      deliveredViaZoho: sentSuccessfully,
-      messageId: messageId || null,
-      adminEmail: ADMIN_EMAIL,
-      sender: SMTP_USER,
-      inquiryId: inquiry.inquiryId,
-      error: sentSuccessfully ? null : lastError?.message,
-    });
+    if (messageId) {
+      return res.json({ success: true, deliveredViaSmtp: true, messageId, inquiryId: rawInquiry.inquiryId });
+    }
+    console.error(`[SMTP] All transports failed for inquiry ${rawInquiry.inquiryId}: ${lastError?.message}`);
+    res.status(502).json({ success: false, deliveredViaSmtp: false, inquiryId: rawInquiry.inquiryId, error: lastError?.message || 'SMTP delivery failed' });
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== 'production') {
+  if (isDev) {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(join(__dirname, 'dist')));
+    const distDir = join(__dirname, 'dist');
+    if (!existsSync(join(distDir, 'index.html'))) {
+      console.error('[Server] dist/index.html not found. Run "npm run build" first.');
+    }
+    app.use(express.static(distDir));
     app.get('*', (_, res) => {
-      res.sendFile(join(__dirname, 'dist', 'index.html'));
+      res.sendFile(join(distDir, 'index.html'));
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  const onListening = () => console.log(`Server running on ${typeof PORT === 'number' ? `http://localhost:${PORT}` : PORT}`);
+  if (typeof PORT === 'number') {
+    app.listen(PORT, '0.0.0.0', onListening);
+  } else {
+    app.listen(PORT, onListening);
+  }
 }
 
 startServer();

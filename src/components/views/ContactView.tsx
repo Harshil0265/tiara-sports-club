@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavRoute } from '../../types';
 import { CLUB_LOCATION, ADMIN_EMAIL } from '../../data/clubData';
 import { saveInquiryToStorage } from '../../data/inquiryStorage';
+import { sendInquiryEmail } from '../../data/inquiryEmail';
 import { 
   MapPin, 
   Phone, 
@@ -31,11 +32,12 @@ export const ContactView: React.FC<ContactViewProps> = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [sportCategory, setSportCategory] = useState('Lawn Tennis');
+  const [sportCategory, setSportCategory] = useState('Tennis');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+  const [emailDelivered, setEmailDelivered] = useState<boolean | null>(null);
   const [copiedCoords, setCopiedCoords] = useState(false);
   const [mapType, setMapType] = useState<'standard' | 'satellite'>('standard');
 
@@ -92,12 +94,8 @@ export const ContactView: React.FC<ContactViewProps> = ({
 
     saveInquiryToStorage(inquiryPayload);
 
-    // Dispatch via Zoho SMTP server endpoint
-    fetch('/api/send-inquiry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(inquiryPayload),
-    }).catch((err) => console.warn('Backend SMTP call failed:', err));
+    setEmailDelivered(null);
+    sendInquiryEmail(inquiryPayload).then(setEmailDelivered);
 
     setTimeout(() => {
       setIsSubmitting(false);
@@ -365,7 +363,7 @@ Thank you for your prompt review of this Vadodara campus inquiry.`);
                       {CLUB_LOCATION.timings}
                     </span>
                     <span className="block text-[11px] text-emerald-500 font-mono mt-0.5">
-                      Courts and gym active until 23:00 daily
+                      Courts, Hyrox box and cafe active until 23:00 daily
                     </span>
                   </div>
                 </div>
@@ -513,7 +511,9 @@ Thank you for your prompt review of this Vadodara campus inquiry.`);
                       <option value="Tennis">Tennis</option>
                       <option value="Pickleball">Pickleball</option>
                       <option value="Badminton">Badminton</option>
-                      <option value="Gym & Fitness">Gym & Fitness</option>
+                      <option value="Hyrox Fitness Box">Hyrox Fitness Box</option>
+                      <option value="Gymnastics">Gymnastics</option>
+                      <option value="Cafe">Cafe</option>
                       <option value="Club Membership">Club Membership</option>
                     </select>
                   </div>
@@ -581,9 +581,9 @@ Thank you for your prompt review of this Vadodara campus inquiry.`);
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-4">
-                  <div className="w-full sm:w-auto flex-1 px-6 py-3 bg-red-600 text-white text-xs font-bold uppercase tracking-wider rounded-xs text-center flex items-center justify-center gap-2 shadow-sm">
+                  <div className={`w-full sm:w-auto flex-1 px-6 py-3 text-white text-xs font-bold uppercase tracking-wider rounded-xs text-center flex items-center justify-center gap-2 shadow-sm ${emailDelivered === false ? 'bg-amber-600' : 'bg-red-600'}`}>
                     <Check className="w-4 h-4" />
-                    <span>Successfully Sent</span>
+                    <span>{emailDelivered === false ? 'Saved · Email Delayed, Please Call +91 98250 88900' : emailDelivered === null ? 'Sending Email...' : 'Successfully Sent'}</span>
                   </div>
 
                   <button

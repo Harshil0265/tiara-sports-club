@@ -105,3 +105,15 @@ export interface AchievementMilestone {
   record: string;
   mvp: string;
 }
+
+export interface Coach {
+  id: string;
+  sportId: string;
+  role: string;
+  name: string;
+  certification: string;
+  experience: string;
+  image: string;
+  description: string;
+  specialities: string[];
+}

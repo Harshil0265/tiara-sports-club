@@ -71,8 +71,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     },
     {
       year: '2019',
-      title: 'High-Performance Strength & Biomechanics Gym',
-      description: 'Commissioned a commercial-grade strength and conditioning gym equipped with Technogym and Hammer Strength suites, drop platforms, and athlete recovery zones.',
+      title: 'Hyrox Fitness Box & Strength Floor',
+      description: 'Commissioned a dedicated Hyrox training box with sled lanes, SkiErgs, rowers, wall balls, and athlete recovery zones.',
     },
     {
       year: '2022',
@@ -174,8 +174,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
               <span className="text-[11px] font-mono uppercase tracking-wider text-neutral-500 block mb-1">
                 DISCIPLINES
               </span>
-              <span className="font-display text-2xl font-black text-red-600">4 CORE</span>
-              <span className="text-[11px] text-neutral-400 block mt-0.5">Tennis, Pickleball, Badminton, Gym</span>
+              <span className="font-display text-2xl font-black text-red-600">6 CORE</span>
+              <span className="text-[11px] text-neutral-400 block mt-0.5">Tennis, Pickleball, Badminton, Hyrox, Gymnastics, Cafe</span>
             </div>
 
             <div>
@@ -214,7 +214,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                 Tiara Sports Club was established to permanently eliminate that divide. Located along the rapid-growth corridor of Sama-Savli Road, our 12-acre campus was master-planned as a dedicated multi-sport sanctuary where professional tournament standards and community wellness coexist seamlessly.
               </p>
               <p>
-                Today, Tiara is not merely a sports venue; it is a full-spectrum sporting ecosystem. On any given evening, you will witness junior state academy prospects drilling with certified coaches, corporate teams playing spirited pickleball doubles under 1,000 Lux floodlights, badminton enthusiasts playing on tournament teak subfloors, and fitness members training in our high-performance strength gym.
+                Today, Tiara is not merely a sports venue; it is a full-spectrum sporting ecosystem. On any given evening, you will witness junior state academy prospects drilling with certified coaches, corporate teams playing spirited pickleball doubles under 1,000 Lux floodlights, badminton enthusiasts playing on tournament teak subfloors, and fitness members training in our Hyrox box, young gymnasts tumbling in the gymnastics arena, and families relaxing at the Tiara cafe.
               </p>
             </div>
 
@@ -288,9 +288,9 @@ export const AboutView: React.FC<AboutViewProps> = ({
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="block text-sm">Strength & Conditioning Gym</strong>
+                  <strong className="block text-sm">Hyrox Fitness Box, Gymnastics & Cafe</strong>
                   <span className={isDarkMode ? 'text-neutral-400' : 'text-slate-600'}>
-                    Commercial Technogym and Hammer Strength equipment, barbell drop platforms, functional sprint turf, and contrast ice bath recovery.
+                    A dedicated Hyrox race-training floor with sleds and SkiErgs, a spring-floor gymnastics arena, and a clubhouse cafe for post-game recovery meals.
                   </span>
                 </div>
               </li>

@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tiara Sports Club logo palette: green #009444, orange #F7941E, vermilion #F15A29, navy #003147, blue #1C75BC */
+@theme {
+  --color-red-50: #fff3ee;
+  --color-red-100: #ffe3d8;
+  --color-red-200: #ffc7b0;
+  --color-red-300: #ff9f78;
+  --color-red-400: #f77b4b;
+  --color-red-500: #f15a29;
+  --color-red-600: #f15a29;
+  --color-red-700: #d1440f;
+  --color-red-800: #a3350d;
+  --color-red-900: #7a290d;
+  --color-red-950: #4a1706;
+  --color-slate-900: #0b0b0b;
+  --color-slate-950: #050505;
+  --color-brand-green: #009444;
+  --color-brand-orange: #f7941e;
+  --color-brand-vermilion: #f15a29;
+  --color-brand-navy: #003147;
+  --color-brand-blue: #1c75bc;
+}
+
 @layer base {
   :root {
     --font-display: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
